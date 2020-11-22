@@ -1,6 +1,6 @@
 {
-  "name": "ReactNativeVideoPlus",
-  "version": "0.0.1",
+  "name": "react-native-video-extension",
+  "version": "0.0.0",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
@@ -8,11 +8,9 @@
     "start": "react-native start",
     "test": "jest",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "copy-pkg": "ncp ./lib/package.json ./dist",
     "copy-readme": "ncp ./README.md ./dist",
-    "copy-files": "yarn copy-pkg && yarn copy-readme",
     "prebuild": "rimraf dist",
-    "build": "tsc -p tsconfig.build.json && yarn copy-files",
+    "build": "tsc -p tsconfig.build.json && yarn copy-readme",
     "prerelease": "yarn build",
     "release": "./node_modules/.bin/standard-version"
   },
