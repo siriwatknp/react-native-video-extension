@@ -8,11 +8,12 @@
     "start": "react-native start",
     "test": "jest",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "copy-readme": "ncp ./README.md ./dist",
+    "copy-readme": "ncp README.md dist/README.md",
     "prebuild": "rimraf dist",
     "build": "tsc -p tsconfig.build.json && yarn copy-readme",
     "prerelease": "yarn build",
-    "release": "./node_modules/.bin/standard-version"
+    "release": "./node_modules/.bin/standard-version",
+    "publish-package": "node scripts/pkg.js && cd dist && yarn publish"
   },
   "dependencies": {
     "@types/react-native-video": "5.0.3",

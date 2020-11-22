@@ -1,6 +1,7 @@
 # OSX
 .idea
 dist
+.npmrc
 #
 .DS_Store
 
