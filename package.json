@@ -9,10 +9,12 @@
     "test": "jest",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "copy-pkg": "ncp ./lib/package.json ./dist",
+    "copy-readme": "ncp ./README.md ./dist",
+    "copy-files": "yarn copy-pkg && yarn copy-readme",
     "prebuild": "rimraf dist",
-    "build": "tsc -p tsconfig.build.json && yarn copy-pkg",
+    "build": "tsc -p tsconfig.build.json && yarn copy-files",
     "prerelease": "yarn build",
-    "release": "cd dist && ../node_modules/.bin/standard-version"
+    "release": "./node_modules/.bin/standard-version"
   },
   "dependencies": {
     "@types/react-native-video": "5.0.3",
