@@ -19,6 +19,7 @@
     "@types/react-native-video": "5.0.3",
     "react": "16.13.1",
     "react-native": "0.63.3",
+    "react-native-svg": "12.1.0",
     "react-native-video": "5.1.0-alpha8"
   },
   "devDependencies": {
