@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useRef } from 'react';
 import {
+  Animated,
   StyleSheet,
   View,
   ViewProps,
@@ -16,8 +17,17 @@ export interface VideoPlayerProps extends VideoProperties {
 }
 
 const VideoPlayer = ({ style, videoStyle, ...props }: VideoPlayerProps) => {
-  const { width, height } = useWindowDimensions();
+  const rotateAnim = useRef(new Animated.Value(0)).current;
   const { fullscreen, enterFullscreen, exitFullscreen } = useVideoCtx();
+
+  React.useEffect(() => {
+    Animated.timing(rotateAnim, {
+      toValue: fullscreen ? 90 : 0,
+      duration: 400,
+      useNativeDriver: true,
+    }).start();
+  }, [rotateAnim, fullscreen]);
+  const { width, height } = useWindowDimensions();
   const fullscreenStyle = {
     view: {
       position: 'absolute' as const,
@@ -30,7 +40,12 @@ const VideoPlayer = ({ style, videoStyle, ...props }: VideoPlayerProps) => {
       transform: [
         { translateY: (height - width) / 2 },
         { translateX: -(height - width) / 2 },
-        { rotate: '90deg' },
+        {
+          rotate: rotateAnim.interpolate({
+            inputRange: [0, 90],
+            outputRange: ['0deg', '90deg'],
+          }),
+        },
       ],
     },
     video: {
@@ -39,23 +54,52 @@ const VideoPlayer = ({ style, videoStyle, ...props }: VideoPlayerProps) => {
     },
   };
   return (
-    <View style={[fullscreen ? fullscreenStyle.view : styles.container, style]}>
-      <Video
-        style={[fullscreen ? fullscreenStyle.video : styles.video, videoStyle]}
-        {...props}
-        controls={false}
-      />
-      <TouchableOpacity
-        style={styles.fullscreen}
-        onPress={fullscreen ? exitFullscreen : enterFullscreen}
+    <>
+      <Animated.View
+        style={[fullscreen ? fullscreenStyle.view : styles.container, style]}
       >
-        {fullscreen ? (
-          <SvgExitFullscreen color={'#fff'} />
-        ) : (
-          <SvgFullscreen color={'#fff'} />
-        )}
-      </TouchableOpacity>
-    </View>
+        <Video
+          style={[
+            fullscreen ? fullscreenStyle.video : styles.video,
+            videoStyle,
+          ]}
+          {...props}
+          controls={false}
+        />
+        <TouchableOpacity
+          style={styles.fullscreen}
+          onPress={fullscreen ? exitFullscreen : enterFullscreen}
+        >
+          {fullscreen ? (
+            <SvgExitFullscreen color={'#fff'} />
+          ) : (
+            <SvgFullscreen color={'#fff'} />
+          )}
+        </TouchableOpacity>
+      </Animated.View>
+      <View
+        style={[
+          { backgroundColor: '#000' },
+          fullscreen
+            ? {
+                width: height,
+                height: width,
+                zIndex: 100000,
+                position: 'absolute' as const,
+                top: 0,
+                left: 0,
+                transform: [
+                  { translateY: (height - width) / 2 },
+                  { translateX: -(height - width) / 2 },
+                  {
+                    rotate: '90deg',
+                  },
+                ],
+              }
+            : styles.hiddenDummy,
+        ]}
+      />
+    </>
   );
 };
 
@@ -73,6 +117,11 @@ const styles = StyleSheet.create({
     bottom: 16,
     right: 16,
     padding: 8,
+  },
+  hiddenDummy: {
+    overflow: 'hidden',
+    height: 0,
+    flex: 0,
   },
 });
 

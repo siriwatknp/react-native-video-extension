@@ -24,6 +24,7 @@ const styles = StyleSheet.create({
   fullscreen: {
     overflow: 'hidden',
     height: 0,
+    flex: 0,
   },
 });
 

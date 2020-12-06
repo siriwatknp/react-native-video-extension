@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { View } from 'react-native';
+import React, { ReactNode, useState } from 'react';
 
 interface VideoContext {
   fullscreen: boolean;
@@ -19,7 +18,19 @@ export const useVideoCtx = () => {
   return value;
 };
 
-const ScreenContainer = ({ children }: React.PropsWithChildren<{}>) => {
+export type ScreenContainerProps = {
+  children:
+    | React.ConsumerProps<VideoContext | undefined>['children']
+    | React.ReactNode;
+};
+
+const isValidConsumer = (
+  children: any,
+): children is React.ConsumerProps<VideoContext | undefined>['children'] => {
+  return typeof children === 'function';
+};
+
+const ScreenContainer = ({ children }: ScreenContainerProps) => {
   const [fullscreen, setFullscreen] = useState(false);
   return (
     <ctx.Provider
@@ -29,7 +40,11 @@ const ScreenContainer = ({ children }: React.PropsWithChildren<{}>) => {
         exitFullscreen: () => setFullscreen(false),
       }}
     >
-      <View style={{ width: '100%', height: '100%' }}>{children}</View>
+      {isValidConsumer(children) ? (
+        <ctx.Consumer>{children}</ctx.Consumer>
+      ) : (
+        children
+      )}
     </ctx.Provider>
   );
 };
