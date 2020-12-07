@@ -2,6 +2,8 @@ import { StyleSheet, useWindowDimensions } from 'react-native';
 import { useFullscreenTransform } from './useFullscreenTransform';
 import { useVideoCtx } from './ScreenContainer';
 
+const BOTTOM_OFFSET = 40
+
 export const useStyles = () => {
   const { fullscreen } = useVideoCtx();
   const { animatedTransform, staticTransform } = useFullscreenTransform();
@@ -35,7 +37,18 @@ export const useStyles = () => {
           }
         : styles.fullscreenBgOverlay,
     ]),
-    fullscreenToggle: styles.fullscreenToggle,
+    fullscreenToggle: {
+      ...styles.fullscreenToggle,
+      ...(fullscreen && { bottom: BOTTOM_OFFSET + 24, right: 32 }),
+    },
+    play: styles.play,
+    seekbarBg: StyleSheet.flatten([
+      fullscreen ? styles.fullscreenSeekbar : styles.seekbar,
+      styles.seekbarBg,
+    ]),
+    seekbarProgress: styles.seekbarProgress,
+    seekbarTime: styles.seekbarTime,
+    time: styles.time
   };
 };
 
@@ -83,4 +96,45 @@ const styles = StyleSheet.create({
     right: 16,
     padding: 8,
   },
+  play: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: [{ translateX: -32 }, { translateY: -32 }],
+  },
+  seekbar: {
+    position: 'absolute',
+    bottom: 0,
+    height: 3,
+    width: '100%',
+  },
+  fullscreenSeekbar: {
+    position: 'absolute',
+    bottom: BOTTOM_OFFSET,
+    height: 4,
+    width: '90%',
+    left: '5%',
+  },
+  seekbarBg: {
+    backgroundColor: 'rgba(255,255,255,0.5)',
+    zIndex: 1,
+  },
+  seekbarProgress: {
+    top: 0,
+    left: 0,
+    bottom: 0,
+    backgroundColor: '#ff2525',
+    position: 'absolute',
+  },
+  seekbarTime: {
+    left: 16,
+    position: 'absolute',
+    bottom: 20,
+    flexDirection: 'row',
+  },
+  time: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
+  }
 });
