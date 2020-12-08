@@ -29,11 +29,16 @@ export interface VideoPlayerProps extends VideoProperties {
 //    |- BgOverlay
 
 const VideoPlayer = ({ style, videoStyle, ...props }: VideoPlayerProps) => {
-  const videoInstance = useRef(Video).current;
+  let videoInstance = useRef<Video>();
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
-  const [paused, setPaused] = useState(props.paused);
-  const { fullscreen, enterFullscreen, exitFullscreen } = useVideoCtx();
+  const {
+    fullscreen,
+    enterFullscreen,
+    exitFullscreen,
+    paused,
+    setPaused,
+  } = useVideoCtx();
   const styles = useStyles();
   return (
     <View style={styles.container}>
@@ -41,11 +46,19 @@ const VideoPlayer = ({ style, videoStyle, ...props }: VideoPlayerProps) => {
         <Video
           style={styles.video}
           {...props}
-          onLoad={({ currentTime, duration }) => {
-            setDuration(duration);
+          ref={(videoRef) => {
+            if (videoRef) {
+              videoInstance.current = videoRef;
+            }
           }}
-          onProgress={({ currentTime }) => {
-            setCurrentTime(currentTime);
+          onLoad={(data) => {
+            setDuration(data.duration);
+          }}
+          onProgress={(data) => {
+            setCurrentTime(data.currentTime);
+          }}
+          onSeek={(data) => {
+            setCurrentTime(data.seekTime);
           }}
           paused={paused}
           controls={false}
@@ -70,7 +83,11 @@ const VideoPlayer = ({ style, videoStyle, ...props }: VideoPlayerProps) => {
             <SvgFullscreen color={'#fff'} />
           )}
         </TouchableOpacity>
-        <Seeker duration={duration} currentTime={currentTime} />
+        <Seeker
+          videoInstance={videoInstance.current}
+          duration={duration}
+          currentTime={currentTime}
+        />
       </Animated.View>
       <View style={styles.bgOverlay} />
     </View>

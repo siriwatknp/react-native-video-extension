@@ -18,58 +18,62 @@ import { VideoPlayer, ScreenContainer, FullscreenHidden } from './lib';
 const App = () => {
   return (
     <ScreenContainer>
-      <StatusBar barStyle="dark-content" />
-      <FullscreenHidden>
-        <View>
-          <Text style={{ fontSize: 24, padding: 16 }}>Fixed Title</Text>
-        </View>
-      </FullscreenHidden>
-      <ScrollView style={styles.scrollView}>
-        <View
-          style={{
-            padding: 16,
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}
-        >
-          <View
-            style={{
-              width: 48,
-              height: 48,
-              borderRadius: 40,
-              backgroundColor: '#a5a5a5',
-              marginRight: 16,
-            }}
-          />
-          <View>
-            <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Author</Text>
-            <Text style={{ fontSize: 16, color: 'rgba(0,0,0,0.6)' }}>
-              {new Date().toDateString()}
-            </Text>
-          </View>
-        </View>
-        <VideoPlayer
-          muted
-          source={{
-            uri:
-              'https://stream.mux.com/CJ008liyyopEp00jejkHzPgd2TK02OOraYC.m3u8',
-          }}
-        />
-        <View style={{ padding: 16 }}>
-          <Text style={{ color: 'rgb(4,77,205)' }}>#siriwatknp</Text>
-          <Text style={{ fontSize: 20, marginVertical: 4 }}>
-            React Native Video Extension is awesome!
-          </Text>
-          <Text style={{ color: 'rgba(0,0,0,0.6)' }}>
-            1.2B views • just now
-          </Text>
-        </View>
-        {global.HermesInternal == null ? null : (
-          <View style={styles.engine}>
-            <Text style={styles.footer}>Engine: Hermes</Text>
-          </View>
-        )}
-      </ScrollView>
+      {({ fullscreen, seeking }) => (
+        <>
+          <StatusBar barStyle="dark-content" />
+          <FullscreenHidden>
+            <View>
+              <Text style={{ fontSize: 24, padding: 16 }}>Fixed Title</Text>
+            </View>
+          </FullscreenHidden>
+          <ScrollView scrollEnabled={!fullscreen && !seeking} style={styles.scrollView}>
+            <View
+              style={{
+                padding: 16,
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}
+            >
+              <View
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 40,
+                  backgroundColor: '#a5a5a5',
+                  marginRight: 16,
+                }}
+              />
+              <View>
+                <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Author</Text>
+                <Text style={{ fontSize: 16, color: 'rgba(0,0,0,0.6)' }}>
+                  {new Date().toDateString()}
+                </Text>
+              </View>
+            </View>
+            <VideoPlayer
+              muted
+              source={{
+                uri:
+                  'https://stream.mux.com/CJ008liyyopEp00jejkHzPgd2TK02OOraYC.m3u8',
+              }}
+            />
+            <View style={{ padding: 16 }}>
+              <Text style={{ color: 'rgb(4,77,205)' }}>#siriwatknp</Text>
+              <Text style={{ fontSize: 20, marginVertical: 4 }}>
+                React Native Video Extension is awesome!
+              </Text>
+              <Text style={{ color: 'rgba(0,0,0,0.6)' }}>
+                1.2B views • just now
+              </Text>
+            </View>
+            {global.HermesInternal == null ? null : (
+              <View style={styles.engine}>
+                <Text style={styles.footer}>Engine: Hermes</Text>
+              </View>
+            )}
+          </ScrollView>
+        </>
+      )}
     </ScreenContainer>
   );
 };

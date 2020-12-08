@@ -23,3 +23,12 @@ export const toTimeView = (sec: number) => {
   }
   return `0:${twoChar(secLeft)}`;
 };
+
+export const getSecondsToSeek = (
+  duration: number,
+  currentTime: number,
+  seekerWidth: number,
+  diffWidth: number,
+) => {
+  return currentTime + (diffWidth / seekerWidth) * duration;
+};

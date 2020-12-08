@@ -1,4 +1,4 @@
-import { toTimeView } from './utils';
+import { getSecondsToSeek, toTimeView } from './utils';
 
 describe('utils', () => {
   it('toTimeView', () => {
@@ -11,5 +11,9 @@ describe('utils', () => {
 
     expect(toTimeView(55.2329839)).toEqual('0:55');
     expect(toTimeView(1.234)).toEqual('0:01');
+  });
+
+  it('getSecondsToSeek', () => {
+    expect(getSecondsToSeek(60, 12, 1000, 100)).toEqual(18);
   });
 });

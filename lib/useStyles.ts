@@ -2,7 +2,7 @@ import { StyleSheet, useWindowDimensions } from 'react-native';
 import { useFullscreenTransform } from './useFullscreenTransform';
 import { useVideoCtx } from './ScreenContainer';
 
-const BOTTOM_OFFSET = 40
+const BOTTOM_OFFSET = 40;
 
 export const useStyles = () => {
   const { fullscreen } = useVideoCtx();
@@ -48,13 +48,16 @@ export const useStyles = () => {
     ]),
     seekbarProgress: styles.seekbarProgress,
     seekbarTime: styles.seekbarTime,
-    time: styles.time
+    time: styles.time,
+    seekbarThumb: styles.seekbarThumb,
+    seekbarThumbTouched: styles.seekbarThumbTouched
   };
 };
 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#000',
+    zIndex: 1,
   },
   initialContainer: {
     width: '100%',
@@ -136,5 +139,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#fff',
+  },
+  seekbarThumb: {
+    backgroundColor: '#ff2525',
+    borderRadius: 40,
+    zIndex: 100,
+    width: 16,
+    height: 16,
+    top: -8,
+    transform: [{ translateX: -8 }],
+  },
+  seekbarThumbTouched: {
+    width: 24,
+    height: 24,
+    top: -12,
+    transform: [{ translateX: -12 }],
   }
 });

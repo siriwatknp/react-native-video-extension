@@ -1,9 +1,13 @@
-import React, { ReactNode, useState } from 'react';
+import React, { useState } from 'react';
 
 interface VideoContext {
   fullscreen: boolean;
   enterFullscreen: () => void;
   exitFullscreen: () => void;
+  seeking: boolean;
+  setSeeking: React.Dispatch<React.SetStateAction<boolean>>
+  paused: boolean;
+  setPaused: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const ctx = React.createContext<VideoContext | undefined>(undefined);
@@ -20,7 +24,7 @@ export const useVideoCtx = () => {
 
 export type ScreenContainerProps = {
   children:
-    | React.ConsumerProps<VideoContext | undefined>['children']
+    | React.ConsumerProps<VideoContext>['children']
     | React.ReactNode;
 };
 
@@ -32,12 +36,18 @@ const isValidConsumer = (
 
 const ScreenContainer = ({ children }: ScreenContainerProps) => {
   const [fullscreen, setFullscreen] = useState(false);
+  const [seeking, setSeeking] = useState(false);
+  const [paused, setPaused] = useState(false);
   return (
     <ctx.Provider
       value={{
         fullscreen,
         enterFullscreen: () => setFullscreen(true),
         exitFullscreen: () => setFullscreen(false),
+        seeking,
+        setSeeking,
+        paused,
+        setPaused,
       }}
     >
       {isValidConsumer(children) ? (
