@@ -5,9 +5,11 @@ interface VideoContext {
   enterFullscreen: () => void;
   exitFullscreen: () => void;
   seeking: boolean;
-  setSeeking: React.Dispatch<React.SetStateAction<boolean>>
+  setSeeking: React.Dispatch<React.SetStateAction<boolean>>;
   paused: boolean;
-  setPaused: React.Dispatch<React.SetStateAction<boolean>>
+  setPaused: React.Dispatch<React.SetStateAction<boolean>>;
+  consoleHidden: boolean;
+  setConsoleHidden: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ctx = React.createContext<VideoContext | undefined>(undefined);
@@ -23,9 +25,7 @@ export const useVideoCtx = () => {
 };
 
 export type ScreenContainerProps = {
-  children:
-    | React.ConsumerProps<VideoContext>['children']
-    | React.ReactNode;
+  children: React.ConsumerProps<VideoContext>['children'] | React.ReactNode;
 };
 
 const isValidConsumer = (
@@ -38,6 +38,7 @@ const ScreenContainer = ({ children }: ScreenContainerProps) => {
   const [fullscreen, setFullscreen] = useState(false);
   const [seeking, setSeeking] = useState(false);
   const [paused, setPaused] = useState(false);
+  const [consoleHidden, setConsoleHidden] = useState(true);
   return (
     <ctx.Provider
       value={{
@@ -48,6 +49,8 @@ const ScreenContainer = ({ children }: ScreenContainerProps) => {
         setSeeking,
         paused,
         setPaused,
+        consoleHidden,
+        setConsoleHidden,
       }}
     >
       {isValidConsumer(children) ? (

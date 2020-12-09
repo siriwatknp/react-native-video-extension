@@ -1,5 +1,5 @@
 import { StyleSheet, useWindowDimensions } from 'react-native';
-import { useFullscreenTransform } from './useFullscreenTransform';
+import { useFullscreenTransform } from './animation';
 import { useVideoCtx } from './ScreenContainer';
 
 const BOTTOM_OFFSET = 40;
@@ -27,8 +27,8 @@ export const useStyles = () => {
     video: StyleSheet.flatten([
       fullscreen ? styles.fullscreenVideo : styles.initialVideo,
     ]),
-    bgOverlay: StyleSheet.flatten([
-      styles.bgOverlay,
+    playerBg: StyleSheet.flatten([
+      styles.playerBg,
       fullscreen
         ? {
             width: height,
@@ -41,7 +41,7 @@ export const useStyles = () => {
       ...styles.fullscreenToggle,
       ...(fullscreen && { bottom: BOTTOM_OFFSET + 24, right: 32 }),
     },
-    play: styles.play,
+    play: fullscreen ? styles.playFullscreen : styles.play,
     seekbarBg: StyleSheet.flatten([
       fullscreen ? styles.fullscreenSeekbar : styles.seekbar,
       styles.seekbarBg,
@@ -50,7 +50,7 @@ export const useStyles = () => {
     seekbarTime: styles.seekbarTime,
     time: styles.time,
     seekbarThumb: styles.seekbarThumb,
-    seekbarThumbTouched: styles.seekbarThumbTouched
+    seekbarThumbTouched: styles.seekbarThumbTouched,
   };
 };
 
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
   },
-  bgOverlay: {
+  playerBg: {
     backgroundColor: '#000',
     position: 'absolute',
   },
@@ -97,18 +97,17 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 16,
     right: 16,
-    padding: 8,
   },
   play: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: [{ translateX: -32 }, { translateY: -32 }],
+    marginHorizontal: 48,
+  },
+  playFullscreen: {
+    marginHorizontal: '12%%',
   },
   seekbar: {
     position: 'absolute',
     bottom: 0,
-    height: 3,
+    height: 2,
     width: '100%',
   },
   fullscreenSeekbar: {
@@ -132,7 +131,7 @@ const styles = StyleSheet.create({
   seekbarTime: {
     left: 16,
     position: 'absolute',
-    bottom: 20,
+    bottom: 16,
     flexDirection: 'row',
   },
   time: {
@@ -146,13 +145,13 @@ const styles = StyleSheet.create({
     zIndex: 100,
     width: 16,
     height: 16,
-    top: -8,
+    top: -7,
     transform: [{ translateX: -8 }],
   },
   seekbarThumbTouched: {
     width: 24,
     height: 24,
-    top: -12,
+    top: -10,
     transform: [{ translateX: -12 }],
-  }
+  },
 });

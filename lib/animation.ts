@@ -1,6 +1,30 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Animated, TransformsStyle, useWindowDimensions } from 'react-native';
 import { useVideoCtx } from './ScreenContainer';
+
+export const useScaleSpring = (hidden: boolean) => {
+  const scaleAnim = useRef(new Animated.Value(hidden ? 0 : 1)).current;
+  useEffect(() => {
+    Animated.spring(scaleAnim, {
+      toValue: hidden ? 0 : 1,
+      friction: hidden ? 10 : 4,
+      useNativeDriver: true,
+    }).start();
+  }, [scaleAnim, hidden]);
+  return scaleAnim
+}
+
+export const useOpacity = (hidden: boolean) => {
+  const opacityAnim = useRef(new Animated.Value(hidden ? 0 : 1)).current;
+  useEffect(() => {
+    Animated.timing(opacityAnim, {
+      toValue: hidden ? 0 : 1,
+      duration: 120,
+      useNativeDriver: true,
+    }).start();
+  }, [opacityAnim, hidden]);
+  return opacityAnim
+};
 
 export const useFullscreenTransform = () => {
   const { width, height } = useWindowDimensions();

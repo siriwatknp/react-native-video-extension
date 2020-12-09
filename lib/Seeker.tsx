@@ -1,15 +1,17 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   StyleSheet,
   Text,
   View,
+  Animated,
   PanResponder,
   PanResponderGestureState,
 } from 'react-native';
 import Video from 'react-native-video';
 import { useStyles } from './useStyles';
-import { toTimeView, getSecondsToSeek } from './utils';
+import { toTimeView, getSecondsToSeek, getThumbPosition } from './utils';
 import { useVideoCtx } from './ScreenContainer';
+import { useOpacity, useScaleSpring } from './animation';
 
 export type SeekerProps = {
   currentTime: number;
@@ -17,13 +19,19 @@ export type SeekerProps = {
   videoInstance?: Video;
 };
 
-const Seeker = ({
-  currentTime,
-  duration,
-  videoInstance,
-}: SeekerProps) => {
+const Seeker = ({ currentTime, duration, videoInstance }: SeekerProps) => {
   const styles = useStyles();
-  const { fullscreen, seeking, setSeeking, setPaused } = useVideoCtx();
+  const {
+    fullscreen,
+    seeking,
+    setSeeking,
+    paused,
+    setPaused,
+    consoleHidden,
+  } = useVideoCtx();
+  const timeOpacity = useOpacity(consoleHidden);
+  const barOpacity = useOpacity(consoleHidden && fullscreen);
+  const scaleAnim = useScaleSpring(consoleHidden);
   const [seekerWidth, setSeekerWidth] = useState(0);
   let seekerRef = useRef({
     duration,
@@ -31,11 +39,14 @@ const Seeker = ({
     seekerWidth,
     videoInstance,
     vertical: fullscreen,
+    paused,
+    pausedOnRelease: false,
   }).current;
   seekerRef.videoInstance = videoInstance;
   seekerRef.duration = duration;
   seekerRef.seekerWidth = seekerWidth;
   seekerRef.vertical = fullscreen;
+  seekerRef.paused = paused;
   if (!seeking) {
     seekerRef.currentTime = currentTime;
   }
@@ -45,6 +56,7 @@ const Seeker = ({
       seekerRef.currentTime,
       seekerRef.seekerWidth,
       seekerRef.vertical ? gestureState.dy : gestureState.dx,
+      8,
     );
     if (seekerRef.videoInstance) {
       seekerRef.videoInstance.seek(seconds);
@@ -56,32 +68,48 @@ const Seeker = ({
       onPanResponderGrant: (e, gestureState) => {
         setSeeking(true);
         setPaused(true);
+        seekerRef.pausedOnRelease = seekerRef.paused;
       },
       onPanResponderMove: (e, gestureState) => {
         handleSeek(gestureState);
       },
       onPanResponderRelease: () => {
         setSeeking(false);
-        setPaused(false);
+        setPaused(seekerRef.pausedOnRelease);
       },
     }),
   ).current;
+  const position = getThumbPosition(duration, currentTime, seekerWidth, 8);
   return (
-    <View
-      style={styles.seekbarBg}
+    <Animated.View
+      style={StyleSheet.flatten([
+        styles.seekbarBg,
+        { opacity: barOpacity }
+      ])}
       onLayout={(e) => {
         setSeekerWidth(e.nativeEvent.layout.width);
       }}
     >
-      <View
+      <Animated.View
         style={{
           ...styles.seekbarThumb,
           ...(seeking && styles.seekbarThumbTouched),
-          left: `${(currentTime * 100) / duration}%`,
+          left: position,
+          transform: [
+            ...(seeking
+              ? styles.seekbarThumbTouched.transform
+              : styles.seekbarThumb.transform),
+            { scale: scaleAnim },
+          ],
         }}
         {...panResponder.panHandlers}
       />
-      <View style={styles.seekbarTime}>
+      <Animated.View
+        style={StyleSheet.flatten([
+          styles.seekbarTime,
+          { opacity: timeOpacity },
+        ])}
+      >
         <Text style={styles.time}>{toTimeView(currentTime)}</Text>
         <Text
           style={StyleSheet.flatten([
@@ -91,16 +119,16 @@ const Seeker = ({
         >
           / {toTimeView(duration)}
         </Text>
-      </View>
+      </Animated.View>
       <View
         style={StyleSheet.flatten([
           styles.seekbarProgress,
           {
-            width: `${(currentTime * 100) / duration}%`,
+            width: position,
           },
         ])}
       />
-    </View>
+    </Animated.View>
   );
 };
 

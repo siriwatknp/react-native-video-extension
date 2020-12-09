@@ -1,4 +1,4 @@
-import { getSecondsToSeek, toTimeView } from './utils';
+import { getSecondsToSeek, toTimeView, getThumbPosition } from './utils';
 
 describe('utils', () => {
   it('toTimeView', () => {
@@ -14,6 +14,10 @@ describe('utils', () => {
   });
 
   it('getSecondsToSeek', () => {
-    expect(getSecondsToSeek(60, 12, 1000, 100)).toEqual(18);
+    expect(getSecondsToSeek(60, 12, 1016, 100, 8)).toEqual(18);
   });
+
+  it('getThumbPosition', () => {
+    expect(getThumbPosition(100, 10, 316, 8)).toEqual(8 + 30)
+  })
 });

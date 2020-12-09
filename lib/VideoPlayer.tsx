@@ -9,12 +9,16 @@ import {
 import Video, { VideoProperties } from 'react-native-video';
 import { useVideoCtx } from './ScreenContainer';
 import Seeker from './Seeker';
+import Overlay from "./Overlay";
 import { useStyles } from './useStyles';
 import {
   SvgFullscreen,
   SvgExitFullscreen,
   SvgPlayArrow,
   SvgPause,
+  SvgReplay10,
+  SvgForward10,
+  SvgRefresh,
 } from '../src/icons';
 
 export interface VideoPlayerProps extends VideoProperties {
@@ -30,6 +34,7 @@ export interface VideoPlayerProps extends VideoProperties {
 
 const VideoPlayer = ({ style, videoStyle, ...props }: VideoPlayerProps) => {
   let videoInstance = useRef<Video>();
+  const [ended, setEnded] = useState(false);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const {
@@ -51,45 +56,77 @@ const VideoPlayer = ({ style, videoStyle, ...props }: VideoPlayerProps) => {
               videoInstance.current = videoRef;
             }
           }}
+          onEnd={() => {
+            setEnded(true)
+          }}
           onLoad={(data) => {
+            setEnded(false)
             setDuration(data.duration);
           }}
           onProgress={(data) => {
             setCurrentTime(data.currentTime);
           }}
           onSeek={(data) => {
-            setCurrentTime(data.seekTime);
+            setCurrentTime(data.currentTime);
           }}
           paused={paused}
           controls={false}
         />
-        <TouchableOpacity
-          style={styles.play}
-          onPress={() => setPaused((bool) => !bool)}
-        >
-          {paused ? (
-            <SvgPlayArrow color={'#fff'} />
-          ) : (
-            <SvgPause color={'#fff'} />
-          )}
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.fullscreenToggle}
-          onPress={fullscreen ? exitFullscreen : enterFullscreen}
-        >
-          {fullscreen ? (
-            <SvgExitFullscreen color={'#fff'} />
-          ) : (
-            <SvgFullscreen color={'#fff'} />
-          )}
-        </TouchableOpacity>
+        <Overlay>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <TouchableOpacity
+              onPress={() => {
+                videoInstance.current?.seek(
+                  currentTime - 10 < 0 ? 0.1 : currentTime - 10,
+                );
+              }}
+            >
+              <SvgReplay10 />
+            </TouchableOpacity>
+            {ended ? (
+              <TouchableOpacity
+                onPress={() => {
+                  videoInstance.current?.seek(0)
+                  setEnded(false)
+                }}
+                style={styles.play}
+              >
+                <SvgRefresh />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                style={styles.play}
+                onPress={() => setPaused((bool) => !bool)}
+              >
+                {paused ? <SvgPlayArrow /> : <SvgPause />}
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity
+              onPress={() => {
+                videoInstance.current?.seek(
+                  currentTime + 10 > duration
+                    ? duration - 0.1
+                    : currentTime + 10,
+                );
+              }}
+            >
+              <SvgForward10 />
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity
+            style={styles.fullscreenToggle}
+            onPress={fullscreen ? exitFullscreen : enterFullscreen}
+          >
+            {fullscreen ? <SvgExitFullscreen /> : <SvgFullscreen />}
+          </TouchableOpacity>
+        </Overlay>
         <Seeker
           videoInstance={videoInstance.current}
           duration={duration}
           currentTime={currentTime}
         />
       </Animated.View>
-      <View style={styles.bgOverlay} />
+      <View style={styles.playerBg} />
     </View>
   );
 };

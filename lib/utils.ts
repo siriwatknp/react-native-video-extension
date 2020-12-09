@@ -29,6 +29,24 @@ export const getSecondsToSeek = (
   currentTime: number,
   seekerWidth: number,
   diffWidth: number,
+  thumbRadius: number,
 ) => {
-  return currentTime + (diffWidth / seekerWidth) * duration;
+  const actualWidth = seekerWidth - 2 * thumbRadius;
+  const result = currentTime + (diffWidth / actualWidth) * duration;
+  if (result >= duration) return duration - 0.1
+  return result <= 0 ? 0.1 : result;
+};
+
+export const getThumbPosition = (
+  duration: number,
+  currentTime: number,
+  seekerWidth: number,
+  thumbRadius: number,
+) => {
+  if (!duration || !seekerWidth) return thumbRadius;
+  const actualWidth = seekerWidth - 2 * thumbRadius;
+  return (
+    thumbRadius +
+    (currentTime > duration ? 1 : currentTime / duration) * actualWidth
+  );
 };
