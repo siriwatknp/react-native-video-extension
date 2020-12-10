@@ -1,12 +1,14 @@
 import { StyleSheet, useWindowDimensions } from 'react-native';
 import { useFullscreenTransform } from './animation';
 import { useVideoCtx } from './ScreenContainer';
+import { getThumbTopOffset } from './utils';
 
 const BOTTOM_OFFSET = 40;
+const THUMB_PADDING = 12;
 
 export const useStyles = () => {
-  const { fullscreen } = useVideoCtx();
-  const { animatedTransform, staticTransform } = useFullscreenTransform();
+  const { fullscreen, config } = useVideoCtx();
+  const { animatedTransform, staticTransform } = useFullscreenTransform(fullscreen, true);
   const { width, height } = useWindowDimensions();
   return {
     container: StyleSheet.flatten([
@@ -46,11 +48,43 @@ export const useStyles = () => {
       fullscreen ? styles.fullscreenSeekbar : styles.seekbar,
       styles.seekbarBg,
     ]),
-    seekbarProgress: styles.seekbarProgress,
+    seekbarProgress: StyleSheet.flatten([
+      styles.seekbarProgress,
+      { backgroundColor: config.seekerColor },
+    ]),
     seekbarTime: styles.seekbarTime,
+    seekbarBuffer: styles.seekbarBuffer,
     time: styles.time,
-    seekbarThumb: styles.seekbarThumb,
-    seekbarThumbTouched: styles.seekbarThumbTouched,
+    seekerThumbRing: StyleSheet.flatten([
+      styles.seekerThumbRing,
+      {
+        padding: THUMB_PADDING,
+        top: getThumbTopOffset(
+          config.seekerThickness,
+          config.thumbRadius + THUMB_PADDING,
+        ),
+        left: -config.thumbRadius - THUMB_PADDING,
+      }
+    ]),
+    seekerThumbRingTouched: {
+      top: getThumbTopOffset(
+        config.seekerThickness,
+        config.thumbTouchedRadius + THUMB_PADDING,
+      ),
+      left: -config.thumbTouchedRadius - THUMB_PADDING,
+    },
+    seekbarThumb: StyleSheet.flatten([
+      styles.seekbarThumb,
+      {
+        width: config.thumbRadius * 2,
+        height: config.thumbRadius * 2,
+        backgroundColor: config.seekerColor,
+      },
+    ]),
+    seekbarThumbTouched: {
+      width: config.thumbTouchedRadius * 2,
+      height: config.thumbTouchedRadius * 2,
+    },
   };
 };
 
@@ -94,9 +128,10 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   fullscreenToggle: {
+    padding: 8,
     position: 'absolute',
     bottom: 16,
-    right: 16,
+    right: 8,
   },
   play: {
     marginHorizontal: 48,
@@ -118,15 +153,19 @@ const styles = StyleSheet.create({
     left: '5%',
   },
   seekbarBg: {
-    backgroundColor: 'rgba(255,255,255,0.5)',
+    backgroundColor: 'rgba(255,255,255,0.38)',
     zIndex: 1,
   },
   seekbarProgress: {
-    top: 0,
-    left: 0,
-    bottom: 0,
-    backgroundColor: '#ff2525',
-    position: 'absolute',
+    // @ts-ignore
+    ...StyleSheet.absoluteFill,
+    zIndex: 2,
+  },
+  seekbarBuffer: {
+    // @ts-ignore
+    ...StyleSheet.absoluteFill,
+    backgroundColor: 'rgba(255,255,255,0.38)',
+    zIndex: 1,
   },
   seekbarTime: {
     left: 16,
@@ -135,23 +174,25 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   time: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
     color: '#fff',
   },
+  seekerThumbRing: {
+    position: 'absolute',
+    padding: THUMB_PADDING,
+    zIndex: 5,
+  },
   seekbarThumb: {
-    backgroundColor: '#ff2525',
     borderRadius: 40,
     zIndex: 100,
-    width: 16,
-    height: 16,
-    top: -7,
-    transform: [{ translateX: -8 }],
-  },
-  seekbarThumbTouched: {
-    width: 24,
-    height: 24,
-    top: -10,
-    transform: [{ translateX: -12 }],
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.24,
+    shadowRadius: 2,
+    shadowOffset: {
+      width: -1,
+      height: 1,
+    },
   },
 });

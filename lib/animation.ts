@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, TransformsStyle, useWindowDimensions } from 'react-native';
-import { useVideoCtx } from './ScreenContainer';
+import { getScaleX, getScaleY } from './utils';
 
 export const useScaleSpring = (hidden: boolean) => {
   const scaleAnim = useRef(new Animated.Value(hidden ? 0 : 1)).current;
@@ -11,8 +11,8 @@ export const useScaleSpring = (hidden: boolean) => {
       useNativeDriver: true,
     }).start();
   }, [scaleAnim, hidden]);
-  return scaleAnim
-}
+  return scaleAnim;
+};
 
 export const useOpacity = (hidden: boolean) => {
   const opacityAnim = useRef(new Animated.Value(hidden ? 0 : 1)).current;
@@ -23,32 +23,52 @@ export const useOpacity = (hidden: boolean) => {
       useNativeDriver: true,
     }).start();
   }, [opacityAnim, hidden]);
-  return opacityAnim
+  return opacityAnim;
 };
 
-export const useFullscreenTransform = () => {
+export const useFullscreenTransform = (
+  fullscreen: boolean,
+  isLandscape: boolean,
+) => {
+  const shouldRotate = isLandscape && fullscreen;
   const { width, height } = useWindowDimensions();
+  const widescreenHeight = width * 0.5625;
   const rotateAnim = useRef(new Animated.Value(0)).current;
-  const { fullscreen } = useVideoCtx();
-
+  const scaleXAnim = useRef(new Animated.Value(1)).current;
+  const scaleYAnim = useRef(new Animated.Value(1)).current;
   React.useEffect(() => {
     Animated.timing(rotateAnim, {
-      toValue: fullscreen ? 90 : 0,
+      toValue: shouldRotate ? 90 : 0,
       duration: 300,
       useNativeDriver: true,
     }).start();
-  }, [rotateAnim, fullscreen]);
+    Animated.timing(scaleXAnim, {
+      toValue: getScaleX({ width, height }, { fullscreen, isLandscape }),
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+    Animated.timing(scaleYAnim, {
+      toValue: getScaleY(
+        { width, height },
+        { height: widescreenHeight, fullscreen, isLandscape },
+      ),
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+  }, [rotateAnim, isLandscape, fullscreen]);
   return {
     staticTransform: [
-      { translateY: (height - width) / 2 },
-      { translateX: -(height - width) / 2 },
+      { translateY: shouldRotate ? (height - width) / 2 : 0 },
+      { translateX: shouldRotate ? -(height - width) / 2 : 0 },
       {
-        rotate: '90deg',
+        rotate: shouldRotate ? '90deg' : '0',
       },
     ] as TransformsStyle['transform'],
     animatedTransform: [
-      { translateY: fullscreen ? (height - width) / 2 : 0 },
-      { translateX: fullscreen ? -(height - width) / 2 : 0 },
+      // { scaleX: scaleXAnim },
+      // { scaleY: scaleYAnim },
+      { translateY: shouldRotate ? (height - width) / 2 : 0 },
+      { translateX: shouldRotate ? -(height - width) / 2 : 0 },
       {
         rotate: (rotateAnim.interpolate({
           inputRange: [0, 90],

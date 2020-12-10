@@ -10,6 +10,13 @@ interface VideoContext {
   setPaused: React.Dispatch<React.SetStateAction<boolean>>;
   consoleHidden: boolean;
   setConsoleHidden: React.Dispatch<React.SetStateAction<boolean>>;
+  config: {
+    thumbRadius: number;
+    thumbTouchedRadius: number;
+    seekerColor: string;
+    seekerThickness: number;
+    seekerFullscreenThickness: number;
+  };
 }
 
 const ctx = React.createContext<VideoContext | undefined>(undefined);
@@ -26,6 +33,7 @@ export const useVideoCtx = () => {
 
 export type ScreenContainerProps = {
   children: React.ConsumerProps<VideoContext>['children'] | React.ReactNode;
+  config?: Partial<VideoContext['config']>;
 };
 
 const isValidConsumer = (
@@ -34,11 +42,12 @@ const isValidConsumer = (
   return typeof children === 'function';
 };
 
-const ScreenContainer = ({ children }: ScreenContainerProps) => {
+const ScreenContainer = ({ children, config = {} }: ScreenContainerProps) => {
   const [fullscreen, setFullscreen] = useState(false);
   const [seeking, setSeeking] = useState(false);
   const [paused, setPaused] = useState(false);
   const [consoleHidden, setConsoleHidden] = useState(true);
+
   return (
     <ctx.Provider
       value={{
@@ -51,6 +60,13 @@ const ScreenContainer = ({ children }: ScreenContainerProps) => {
         setPaused,
         consoleHidden,
         setConsoleHidden,
+        config: {
+          thumbRadius: config?.thumbRadius ?? 8,
+          thumbTouchedRadius: config?.thumbTouchedRadius ?? 12,
+          seekerColor: config?.seekerColor ?? '#ff2525',
+          seekerThickness: config?.seekerThickness ?? 2,
+          seekerFullscreenThickness: config?.seekerFullscreenThickness ?? 4,
+        },
       }}
     >
       {isValidConsumer(children) ? (

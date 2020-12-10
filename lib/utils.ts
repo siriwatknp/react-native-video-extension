@@ -33,7 +33,7 @@ export const getSecondsToSeek = (
 ) => {
   const actualWidth = seekerWidth - 2 * thumbRadius;
   const result = currentTime + (diffWidth / actualWidth) * duration;
-  if (result >= duration) return duration - 0.1
+  if (result >= duration) return duration - 0.1;
   return result <= 0 ? 0.1 : result;
 };
 
@@ -49,4 +49,33 @@ export const getThumbPosition = (
     thumbRadius +
     (currentTime > duration ? 1 : currentTime / duration) * actualWidth
   );
+};
+
+export const getThumbTopOffset = (
+  seekerThickness: number,
+  thumbRadius: number,
+) => {
+  return -(thumbRadius * 2 - seekerThickness) / 2;
+};
+
+export const getScaleX = (
+  deviceSize: { width: number; height: number },
+  videoState: { fullscreen: boolean; isLandscape: boolean },
+) => {
+  if (videoState.fullscreen && videoState.isLandscape) {
+    return deviceSize.height / deviceSize.width;
+  }
+  return 1;
+};
+
+export const getScaleY = (
+  deviceSize: { width: number; height: number },
+  videoState: { height: number; fullscreen: boolean; isLandscape: boolean },
+) => {
+  if (videoState.fullscreen) {
+    return videoState.isLandscape
+      ? deviceSize.width / videoState.height
+      : deviceSize.height / videoState.height;
+  }
+  return 1
 };

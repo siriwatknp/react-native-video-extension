@@ -37,12 +37,14 @@ const VideoPlayer = ({ style, videoStyle, ...props }: VideoPlayerProps) => {
   const [ended, setEnded] = useState(false);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
+  const [bufferTime, setBufferTime] = useState(0);
   const {
     fullscreen,
     enterFullscreen,
     exitFullscreen,
     paused,
     setPaused,
+    setSeeking,
   } = useVideoCtx();
   const styles = useStyles();
   return (
@@ -65,9 +67,11 @@ const VideoPlayer = ({ style, videoStyle, ...props }: VideoPlayerProps) => {
           }}
           onProgress={(data) => {
             setCurrentTime(data.currentTime);
+            setBufferTime(data.playableDuration);
           }}
           onSeek={(data) => {
             setCurrentTime(data.currentTime);
+            setSeeking(false);
           }}
           paused={paused}
           controls={false}
@@ -75,6 +79,7 @@ const VideoPlayer = ({ style, videoStyle, ...props }: VideoPlayerProps) => {
         <Overlay>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <TouchableOpacity
+              style={{ padding: 8 }}
               onPress={() => {
                 videoInstance.current?.seek(
                   currentTime - 10 < 0 ? 0.1 : currentTime - 10,
@@ -102,6 +107,7 @@ const VideoPlayer = ({ style, videoStyle, ...props }: VideoPlayerProps) => {
               </TouchableOpacity>
             )}
             <TouchableOpacity
+              style={{ padding: 8 }}
               onPress={() => {
                 videoInstance.current?.seek(
                   currentTime + 10 > duration
@@ -124,6 +130,8 @@ const VideoPlayer = ({ style, videoStyle, ...props }: VideoPlayerProps) => {
           videoInstance={videoInstance.current}
           duration={duration}
           currentTime={currentTime}
+          bufferTime={bufferTime}
+          vertical={fullscreen}
         />
       </Animated.View>
       <View style={styles.playerBg} />

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -16,10 +16,18 @@ import { useOpacity, useScaleSpring } from './animation';
 export type SeekerProps = {
   currentTime: number;
   duration: number;
+  bufferTime: number;
+  vertical: boolean;
   videoInstance?: Video;
 };
 
-const Seeker = ({ currentTime, duration, videoInstance }: SeekerProps) => {
+const Seeker = ({
+  currentTime,
+  duration,
+  bufferTime,
+  videoInstance,
+  vertical,
+}: SeekerProps) => {
   const styles = useStyles();
   const {
     fullscreen,
@@ -28,25 +36,47 @@ const Seeker = ({ currentTime, duration, videoInstance }: SeekerProps) => {
     paused,
     setPaused,
     consoleHidden,
+    config,
   } = useVideoCtx();
   const timeOpacity = useOpacity(consoleHidden);
   const barOpacity = useOpacity(consoleHidden && fullscreen);
   const scaleAnim = useScaleSpring(consoleHidden);
   const [seekerWidth, setSeekerWidth] = useState(0);
+  const position = getThumbPosition(
+    duration,
+    currentTime,
+    seekerWidth,
+    config.thumbRadius,
+  );
+  const bufferPosition = getThumbPosition(
+    duration,
+    bufferTime,
+    seekerWidth,
+    config.thumbRadius,
+  );
+
+  const pan = useRef(new Animated.Value(position)).current;
+  useEffect(() => {
+    if (!seeking) {
+      pan.setValue(position);
+    }
+  }, [position]);
   let seekerRef = useRef({
+    position,
     duration,
     currentTime,
     seekerWidth,
     videoInstance,
-    vertical: fullscreen,
+    vertical,
     paused,
     pausedOnRelease: false,
   }).current;
   seekerRef.videoInstance = videoInstance;
   seekerRef.duration = duration;
   seekerRef.seekerWidth = seekerWidth;
-  seekerRef.vertical = fullscreen;
+  seekerRef.vertical = vertical;
   seekerRef.paused = paused;
+  seekerRef.position = position;
   if (!seeking) {
     seekerRef.currentTime = currentTime;
   }
@@ -65,45 +95,47 @@ const Seeker = ({ currentTime, duration, videoInstance }: SeekerProps) => {
   const panResponder = useRef(
     PanResponder.create({
       onMoveShouldSetPanResponder: () => true,
-      onPanResponderGrant: (e, gestureState) => {
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderGrant: () => {
         setSeeking(true);
         setPaused(true);
         seekerRef.pausedOnRelease = seekerRef.paused;
       },
       onPanResponderMove: (e, gestureState) => {
-        handleSeek(gestureState);
+        pan.setValue(
+          seekerRef.position +
+            (seekerRef.vertical ? gestureState.dy : gestureState.dx),
+        );
       },
-      onPanResponderRelease: () => {
-        setSeeking(false);
+      onPanResponderRelease: (e, gestureState) => {
+        handleSeek(gestureState);
         setPaused(seekerRef.pausedOnRelease);
       },
     }),
   ).current;
-  const position = getThumbPosition(duration, currentTime, seekerWidth, 8);
   return (
     <Animated.View
-      style={StyleSheet.flatten([
-        styles.seekbarBg,
-        { opacity: barOpacity }
-      ])}
+      style={StyleSheet.flatten([styles.seekbarBg, { opacity: barOpacity }])}
       onLayout={(e) => {
         setSeekerWidth(e.nativeEvent.layout.width);
       }}
     >
       <Animated.View
         style={{
-          ...styles.seekbarThumb,
-          ...(seeking && styles.seekbarThumbTouched),
-          left: position,
-          transform: [
-            ...(seeking
-              ? styles.seekbarThumbTouched.transform
-              : styles.seekbarThumb.transform),
-            { scale: scaleAnim },
-          ],
+          ...styles.seekerThumbRing,
+          ...(seeking && styles.seekerThumbRingTouched),
+          transform: [{ translateX: seeking ? pan : position }],
         }}
         {...panResponder.panHandlers}
-      />
+      >
+        <Animated.View
+          style={{
+            ...styles.seekbarThumb,
+            ...(seeking && styles.seekbarThumbTouched),
+            transform: [{ scale: scaleAnim }],
+          }}
+        />
+      </Animated.View>
       <Animated.View
         style={StyleSheet.flatten([
           styles.seekbarTime,
@@ -125,6 +157,14 @@ const Seeker = ({ currentTime, duration, videoInstance }: SeekerProps) => {
           styles.seekbarProgress,
           {
             width: position,
+          },
+        ])}
+      />
+      <View
+        style={StyleSheet.flatten([
+          styles.seekbarBuffer,
+          {
+            width: bufferPosition,
           },
         ])}
       />
