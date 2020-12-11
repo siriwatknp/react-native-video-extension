@@ -8,14 +8,30 @@
  * @format
  */
 
-import React from 'react';
-import { StyleSheet, ScrollView, View, Text, StatusBar } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  StyleSheet,
+  ScrollView,
+  View,
+  Text,
+  StatusBar,
+  Animated,
+} from 'react-native';
 
 declare const global: { HermesInternal: null | {} };
 
 import { VideoPlayer, ScreenContainer, FullscreenHidden } from './lib';
 
 const App = () => {
+  const widthAnim = useRef(new Animated.Value(200)).current;
+  const [toggled, setToggled] = useState(false);
+  useEffect(() => {
+    Animated.timing(widthAnim, {
+      toValue: toggled ? 400 : 300,
+      useNativeDriver: false,
+      duration: 300,
+    }).start();
+  }, [widthAnim, toggled]);
   return (
     <ScreenContainer>
       {({ fullscreen, seeking }) => (
@@ -26,7 +42,10 @@ const App = () => {
               <Text style={{ fontSize: 24, padding: 16 }}>Fixed Title</Text>
             </View>
           </FullscreenHidden>
-          <ScrollView scrollEnabled={!fullscreen && !seeking} style={styles.scrollView}>
+          <ScrollView
+            scrollEnabled={!fullscreen && !seeking}
+            style={styles.scrollView}
+          >
             <View
               style={{
                 padding: 16,
@@ -54,7 +73,8 @@ const App = () => {
               muted
               source={{
                 uri:
-                  'https://stream.mux.com/G00t93XO3sf44WxV9N9ts1fpIHvXgLy72x86wW00lq8s4.m3u8',
+                  'https://stream.mux.com/M4K00I202qH2AQkbt2dW7r6l91oqTGRk5j76tKNBfdgOk.m3u8',
+                // 'https://stream.mux.com/G00t93XO3sf44WxV9N9ts1fpIHvXgLy72x86wW00lq8s4.m3u8',
               }}
             />
             <View style={{ padding: 16 }}>
@@ -66,6 +86,14 @@ const App = () => {
                 1.2B views • just now
               </Text>
             </View>
+            <Animated.View
+              onTouchEnd={() => setToggled((bool) => !bool)}
+              style={{
+                width: widthAnim,
+                height: 200,
+                backgroundColor: 'tomato',
+              }}
+            />
             {global.HermesInternal == null ? null : (
               <View style={styles.engine}>
                 <Text style={styles.footer}>Engine: Hermes</Text>

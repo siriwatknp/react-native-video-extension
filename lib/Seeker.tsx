@@ -8,7 +8,7 @@ import {
   PanResponderGestureState,
 } from 'react-native';
 import Video from 'react-native-video';
-import { useStyles } from './useStyles';
+import useSeekerStyles from "./useSeekerStyles";
 import { toTimeView, getSecondsToSeek, getThumbPosition } from './utils';
 import { useVideoCtx } from './ScreenContainer';
 import { useOpacity, useScaleSpring } from './animation';
@@ -28,7 +28,7 @@ const Seeker = ({
   videoInstance,
   vertical,
 }: SeekerProps) => {
-  const styles = useStyles();
+  const styles = useSeekerStyles();
   const {
     fullscreen,
     seeking,

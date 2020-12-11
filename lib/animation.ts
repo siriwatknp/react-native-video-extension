@@ -1,6 +1,5 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Animated, TransformsStyle, useWindowDimensions } from 'react-native';
-import { getScaleX, getScaleY } from './utils';
 
 export const useScaleSpring = (hidden: boolean) => {
   const scaleAnim = useRef(new Animated.Value(hidden ? 0 : 1)).current;
@@ -26,36 +25,41 @@ export const useOpacity = (hidden: boolean) => {
   return opacityAnim;
 };
 
-export const useFullscreenTransform = (
+export const useAnimatedFullscreen = (
   fullscreen: boolean,
   isLandscape: boolean,
 ) => {
   const shouldRotate = isLandscape && fullscreen;
   const { width, height } = useWindowDimensions();
-  const widescreenHeight = width * 0.5625;
+  const prevFullscreen = useRef(fullscreen)
   const rotateAnim = useRef(new Animated.Value(0)).current;
-  const scaleXAnim = useRef(new Animated.Value(1)).current;
-  const scaleYAnim = useRef(new Animated.Value(1)).current;
-  React.useEffect(() => {
+  const opacityAnim = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
     Animated.timing(rotateAnim, {
       toValue: shouldRotate ? 90 : 0,
       duration: 300,
       useNativeDriver: true,
     }).start();
-    Animated.timing(scaleXAnim, {
-      toValue: getScaleX({ width, height }, { fullscreen, isLandscape }),
-      duration: 200,
-      useNativeDriver: true,
-    }).start();
-    Animated.timing(scaleYAnim, {
-      toValue: getScaleY(
-        { width, height },
-        { height: widescreenHeight, fullscreen, isLandscape },
-      ),
-      duration: 200,
-      useNativeDriver: true,
-    }).start();
-  }, [rotateAnim, isLandscape, fullscreen]);
+  }, [rotateAnim, shouldRotate]);
+  useEffect(() => {
+    if (prevFullscreen.current !== fullscreen && !isLandscape) {
+      Animated.sequence([
+        Animated.timing(opacityAnim, {
+          toValue: 0,
+          duration: 0,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacityAnim, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        })
+      ]).start()
+    }
+  }, [opacityAnim, fullscreen, isLandscape])
+  useEffect(() => {
+    prevFullscreen.current = fullscreen
+  }, [fullscreen])
   return {
     staticTransform: [
       { translateY: shouldRotate ? (height - width) / 2 : 0 },
@@ -65,8 +69,6 @@ export const useFullscreenTransform = (
       },
     ] as TransformsStyle['transform'],
     animatedTransform: [
-      // { scaleX: scaleXAnim },
-      // { scaleY: scaleYAnim },
       { translateY: shouldRotate ? (height - width) / 2 : 0 },
       { translateX: shouldRotate ? -(height - width) / 2 : 0 },
       {
@@ -76,5 +78,12 @@ export const useFullscreenTransform = (
         }) as unknown) as string,
       },
     ] as TransformsStyle['transform'],
+    fullscreenSize: {
+      width: isLandscape ? height : width,
+      height: isLandscape ? width : height,
+    },
+    animatedOpacity: {
+      opacity: opacityAnim
+    }
   };
 };

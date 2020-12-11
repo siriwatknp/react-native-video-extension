@@ -4,13 +4,12 @@ import {
   View,
   ViewProps,
   TouchableOpacity,
-  StyleSheet,
 } from 'react-native';
 import Video, { VideoProperties } from 'react-native-video';
 import { useVideoCtx } from './ScreenContainer';
 import Seeker from './Seeker';
 import Overlay from "./Overlay";
-import { useStyles } from './useStyles';
+import useControllerStyles from './useControllerStyles';
 import {
   SvgFullscreen,
   SvgExitFullscreen,
@@ -38,6 +37,7 @@ const VideoPlayer = ({ style, videoStyle, ...props }: VideoPlayerProps) => {
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [bufferTime, setBufferTime] = useState(0);
+  const [isLandscape, setIsLandscape] = useState(false);
   const {
     fullscreen,
     enterFullscreen,
@@ -46,7 +46,7 @@ const VideoPlayer = ({ style, videoStyle, ...props }: VideoPlayerProps) => {
     setPaused,
     setSeeking,
   } = useVideoCtx();
-  const styles = useStyles();
+  const styles = useControllerStyles(isLandscape);
   return (
     <View style={styles.container}>
       <Animated.View style={styles.controller}>
@@ -64,8 +64,10 @@ const VideoPlayer = ({ style, videoStyle, ...props }: VideoPlayerProps) => {
           onLoad={(data) => {
             setEnded(false)
             setDuration(data.duration);
+            setIsLandscape(data.naturalSize.orientation === 'landscape')
           }}
           onProgress={(data) => {
+            setEnded(false)
             setCurrentTime(data.currentTime);
             setBufferTime(data.playableDuration);
           }}
@@ -131,7 +133,7 @@ const VideoPlayer = ({ style, videoStyle, ...props }: VideoPlayerProps) => {
           duration={duration}
           currentTime={currentTime}
           bufferTime={bufferTime}
-          vertical={fullscreen}
+          vertical={fullscreen && isLandscape}
         />
       </Animated.View>
       <View style={styles.playerBg} />

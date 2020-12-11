@@ -1,49 +1,13 @@
-import { StyleSheet, useWindowDimensions } from 'react-native';
-import { useFullscreenTransform } from './animation';
+import { StyleSheet } from 'react-native';
 import { useVideoCtx } from './ScreenContainer';
 import { getThumbTopOffset } from './utils';
 
 const BOTTOM_OFFSET = 40;
 const THUMB_PADDING = 12;
 
-export const useStyles = () => {
+const useSeekerStyles = () => {
   const { fullscreen, config } = useVideoCtx();
-  const { animatedTransform, staticTransform } = useFullscreenTransform(fullscreen, true);
-  const { width, height } = useWindowDimensions();
   return {
-    container: StyleSheet.flatten([
-      styles.container,
-      fullscreen ? styles.fullscreenContainer : styles.initialContainer,
-    ]),
-    controller: StyleSheet.flatten([
-      styles.controller,
-      fullscreen && {
-        width: height,
-        height: width,
-        ...styles.fullscreenController,
-      },
-      {
-        transform: animatedTransform,
-      },
-    ]),
-    video: StyleSheet.flatten([
-      fullscreen ? styles.fullscreenVideo : styles.initialVideo,
-    ]),
-    playerBg: StyleSheet.flatten([
-      styles.playerBg,
-      fullscreen
-        ? {
-            width: height,
-            height: width,
-            transform: staticTransform,
-          }
-        : styles.fullscreenBgOverlay,
-    ]),
-    fullscreenToggle: {
-      ...styles.fullscreenToggle,
-      ...(fullscreen && { bottom: BOTTOM_OFFSET + 24, right: 32 }),
-    },
-    play: fullscreen ? styles.playFullscreen : styles.play,
     seekbarBg: StyleSheet.flatten([
       fullscreen ? styles.fullscreenSeekbar : styles.seekbar,
       styles.seekbarBg,
@@ -89,56 +53,6 @@ export const useStyles = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#000',
-    zIndex: 1,
-  },
-  initialContainer: {
-    width: '100%',
-  },
-  fullscreenContainer: {
-    position: 'absolute',
-    zIndex: 1000000,
-    top: 0,
-    left: 0,
-  },
-  controller: {
-    zIndex: 1,
-  },
-  fullscreenController: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-  },
-  playerBg: {
-    backgroundColor: '#000',
-    position: 'absolute',
-  },
-  fullscreenBgOverlay: {
-    top: 0,
-    left: 0,
-  },
-  initialVideo: {
-    height: undefined,
-    aspectRatio: 16 / 9,
-    maxWidth: '100%',
-  },
-  fullscreenVideo: {
-    width: '100%',
-    height: '100%',
-  },
-  fullscreenToggle: {
-    padding: 8,
-    position: 'absolute',
-    bottom: 16,
-    right: 8,
-  },
-  play: {
-    marginHorizontal: 48,
-  },
-  playFullscreen: {
-    marginHorizontal: '12%%',
-  },
   seekbar: {
     position: 'absolute',
     bottom: 0,
@@ -196,3 +110,5 @@ const styles = StyleSheet.create({
     },
   },
 });
+
+export default useSeekerStyles;

@@ -58,24 +58,25 @@ export const getThumbTopOffset = (
   return -(thumbRadius * 2 - seekerThickness) / 2;
 };
 
-export const getScaleX = (
+// todo: remove this fn if not use
+export const calculatePlayerWidth = (
   deviceSize: { width: number; height: number },
-  videoState: { fullscreen: boolean; isLandscape: boolean },
+  videoState: { width: number; fullscreen: boolean; isLandscape: boolean },
 ) => {
-  if (videoState.fullscreen && videoState.isLandscape) {
-    return deviceSize.height / deviceSize.width;
+  if (videoState.fullscreen) {
+    return videoState.isLandscape ? deviceSize.height : deviceSize.width;
   }
-  return 1;
+  return videoState.width;
 };
 
-export const getScaleY = (
+export const calculatePlayerHeight = (
   deviceSize: { width: number; height: number },
   videoState: { height: number; fullscreen: boolean; isLandscape: boolean },
 ) => {
   if (videoState.fullscreen) {
     return videoState.isLandscape
-      ? deviceSize.width / videoState.height
-      : deviceSize.height / videoState.height;
+      ? deviceSize.width
+      : deviceSize.height;
   }
-  return 1
+  return videoState.height;
 };
