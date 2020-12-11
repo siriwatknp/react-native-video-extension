@@ -1,8 +1,12 @@
 import { StyleSheet } from 'react-native';
 import { useAnimatedFullscreen } from './animation';
 import { useVideoCtx } from './ScreenContainer';
+import { getAspectRatio, AspectRatio } from './utils';
 
-const useControllerStyles = (isLandscape: boolean) => {
+const useControllerStyles = (
+  aspectRatio: AspectRatio,
+  isLandscape: boolean,
+) => {
   const { fullscreen } = useVideoCtx();
   const {
     animatedTransform,
@@ -27,7 +31,12 @@ const useControllerStyles = (isLandscape: boolean) => {
       animatedOpacity,
     ]),
     video: StyleSheet.flatten([
-      fullscreen ? styles.fullscreenVideo : styles.initialVideo,
+      fullscreen
+        ? styles.fullscreenVideo
+        : {
+            ...styles.initialVideo,
+            aspectRatio: getAspectRatio(aspectRatio),
+          },
     ]),
     playerBg: StyleSheet.flatten([
       styles.playerBg,
@@ -78,7 +87,6 @@ const styles = StyleSheet.create({
   },
   initialVideo: {
     height: undefined,
-    aspectRatio: 16 / 9,
     maxWidth: '100%',
   },
   fullscreenVideo: {

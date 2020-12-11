@@ -5,7 +5,7 @@ import { useVideoCtx } from './ScreenContainer';
 import Seeker from './Seeker';
 import Overlay from './Overlay';
 import useControllerStyles from './useControllerStyles';
-import usePaused from "./usePause";
+import usePaused from './usePause';
 import {
   SvgFullscreen,
   SvgExitFullscreen,
@@ -15,11 +15,13 @@ import {
   SvgForward10,
   SvgRefresh,
 } from '../src/icons';
+import { AspectRatio } from './utils';
 
 export interface VideoPlayerProps extends Omit<VideoProperties, 'paused'> {
   style?: ViewProps['style'];
   videoStyle?: VideoProperties['style'];
   initialPaused?: boolean;
+  initialAspectRatio?: AspectRatio;
 }
 
 // View Hierarchy
@@ -28,13 +30,19 @@ export interface VideoPlayerProps extends Omit<VideoProperties, 'paused'> {
 //    |  |- RNVideo
 //    |- BgOverlay
 
-const VideoPlayer = ({ initialPaused, style, videoStyle, ...props }: VideoPlayerProps) => {
+const VideoPlayer = ({
+  initialPaused,
+  initialAspectRatio = 'landscape',
+  style,
+  videoStyle,
+  ...props
+}: VideoPlayerProps) => {
   let videoInstance = useRef<Video>();
   const [ended, setEnded] = useState(false);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [bufferTime, setBufferTime] = useState(0);
-  const paused = usePaused(initialPaused)
+  const paused = usePaused(initialPaused);
   const {
     fullscreen,
     enterFullscreen,
@@ -44,7 +52,7 @@ const VideoPlayer = ({ initialPaused, style, videoStyle, ...props }: VideoPlayer
     setPaused,
     setSeeking,
   } = useVideoCtx();
-  const styles = useControllerStyles(isLandscape);
+  const styles = useControllerStyles(initialAspectRatio, isLandscape);
   return (
     <View style={styles.container}>
       <Animated.View style={styles.controller}>

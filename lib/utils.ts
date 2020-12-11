@@ -1,4 +1,4 @@
-import {FullscreenOrientation, VideoContext} from "./ScreenContainer";
+import { VideoContext } from './ScreenContainer';
 
 const HOUR = 60 * 60;
 const MINUTE = 60;
@@ -60,12 +60,22 @@ export const getThumbTopOffset = (
   return -(thumbRadius * 2 - seekerThickness) / 2;
 };
 
-export const calculateRotationDegree = (isLandscape: boolean, fullscreen?: VideoContext['fullscreen']) => {
-  if (!isLandscape) return 0
-  if (fullscreen === 'LANDSCAPE-LEFT') return 90
-  if (fullscreen === 'LANDSCAPE-RIGHT') return -90
-  return 0
-}
+export const calculateRotationDegree = (
+  isLandscape: boolean,
+  fullscreen?: VideoContext['fullscreen'],
+) => {
+  if (!isLandscape) return 0;
+  if (fullscreen === 'LANDSCAPE-LEFT') return 90;
+  if (fullscreen === 'LANDSCAPE-RIGHT') return -90;
+  return 0;
+};
+
+export type AspectRatio = 'landscape' | 'portrait' | number;
+export const getAspectRatio = (ratio: AspectRatio) => {
+  if (typeof ratio === 'number') return ratio;
+  if (ratio === 'portrait') return 3 / 4;
+  return 16 / 9;
+};
 
 // todo: remove this fn if not use
 export const calculatePlayerWidth = (
@@ -83,9 +93,7 @@ export const calculatePlayerHeight = (
   videoState: { height: number; fullscreen: boolean; isLandscape: boolean },
 ) => {
   if (videoState.fullscreen) {
-    return videoState.isLandscape
-      ? deviceSize.width
-      : deviceSize.height;
+    return videoState.isLandscape ? deviceSize.width : deviceSize.height;
   }
   return videoState.height;
 };
