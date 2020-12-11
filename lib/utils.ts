@@ -1,3 +1,5 @@
+import {FullscreenOrientation, VideoContext} from "./ScreenContainer";
+
 const HOUR = 60 * 60;
 const MINUTE = 60;
 
@@ -57,6 +59,13 @@ export const getThumbTopOffset = (
 ) => {
   return -(thumbRadius * 2 - seekerThickness) / 2;
 };
+
+export const calculateRotationDegree = (isLandscape: boolean, fullscreen?: VideoContext['fullscreen']) => {
+  if (!isLandscape) return 0
+  if (fullscreen === 'LANDSCAPE-LEFT') return 90
+  if (fullscreen === 'LANDSCAPE-RIGHT') return -90
+  return 0
+}
 
 // todo: remove this fn if not use
 export const calculatePlayerWidth = (

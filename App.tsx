@@ -8,30 +8,21 @@
  * @format
  */
 
-import React, { useEffect, useRef, useState } from 'react';
-import {
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  StatusBar,
-  Animated,
-} from 'react-native';
-
+import React from 'react';
+import { StyleSheet, ScrollView, View, Text, StatusBar } from 'react-native';
+import Orientation from "react-native-orientation-locker";
 declare const global: { HermesInternal: null | {} };
 
-import { VideoPlayer, ScreenContainer, FullscreenHidden } from './lib';
+import {
+  VideoPlayer,
+  ScreenContainer,
+  FullscreenHidden,
+  connectOrientationLib,
+} from './lib';
+
+connectOrientationLib(Orientation)
 
 const App = () => {
-  const widthAnim = useRef(new Animated.Value(200)).current;
-  const [toggled, setToggled] = useState(false);
-  useEffect(() => {
-    Animated.timing(widthAnim, {
-      toValue: toggled ? 400 : 300,
-      useNativeDriver: false,
-      duration: 300,
-    }).start();
-  }, [widthAnim, toggled]);
   return (
     <ScreenContainer>
       {({ fullscreen, seeking }) => (
@@ -86,14 +77,6 @@ const App = () => {
                 1.2B views • just now
               </Text>
             </View>
-            <Animated.View
-              onTouchEnd={() => setToggled((bool) => !bool)}
-              style={{
-                width: widthAnim,
-                height: 200,
-                backgroundColor: 'tomato',
-              }}
-            />
             {global.HermesInternal == null ? null : (
               <View style={styles.engine}>
                 <Text style={styles.footer}>Engine: Hermes</Text>

@@ -39,7 +39,7 @@ const Seeker = ({
     config,
   } = useVideoCtx();
   const timeOpacity = useOpacity(consoleHidden);
-  const barOpacity = useOpacity(consoleHidden && fullscreen);
+  const barOpacity = useOpacity(consoleHidden && !!fullscreen);
   const scaleAnim = useScaleSpring(consoleHidden);
   const [seekerWidth, setSeekerWidth] = useState(0);
   const position = getThumbPosition(

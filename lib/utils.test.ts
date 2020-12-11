@@ -3,6 +3,7 @@ import {
   toTimeView,
   getThumbPosition,
   getThumbTopOffset,
+  calculateRotationDegree,
 } from './utils';
 
 describe('utils', () => {
@@ -29,5 +30,12 @@ describe('utils', () => {
   it('getThumbTopOffset', () => {
     expect(getThumbTopOffset(2, 8)).toEqual(-7);
     expect(getThumbTopOffset(20, 8)).toEqual(2);
+  });
+
+  it('calculateRotationDegree', () => {
+    expect(calculateRotationDegree(false)).toEqual(0);
+    expect(calculateRotationDegree(true, false)).toEqual(0);
+    expect(calculateRotationDegree(true, 'LANDSCAPE-LEFT')).toEqual(90);
+    expect(calculateRotationDegree(true, 'LANDSCAPE-RIGHT')).toEqual(-90);
   });
 });

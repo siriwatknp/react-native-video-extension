@@ -1,5 +1,9 @@
 import { useEffect, useRef } from 'react';
-import { Animated, TransformsStyle, useWindowDimensions } from 'react-native';
+import { Animated, TransformsStyle, Dimensions } from 'react-native';
+import { calculateRotationDegree } from './utils';
+import { VideoContext } from './ScreenContainer';
+
+const portraitDimension = Dimensions.get('window');
 
 export const useScaleSpring = (hidden: boolean) => {
   const scaleAnim = useRef(new Animated.Value(hidden ? 0 : 1)).current;
@@ -26,23 +30,23 @@ export const useOpacity = (hidden: boolean) => {
 };
 
 export const useAnimatedFullscreen = (
-  fullscreen: boolean,
+  fullscreen: VideoContext['fullscreen'],
   isLandscape: boolean,
 ) => {
   const shouldRotate = isLandscape && fullscreen;
-  const { width, height } = useWindowDimensions();
-  const prevFullscreen = useRef(fullscreen)
+  const { width, height } = portraitDimension;
+  const prevFullscreen = useRef(fullscreen);
   const rotateAnim = useRef(new Animated.Value(0)).current;
   const opacityAnim = useRef(new Animated.Value(1)).current;
   useEffect(() => {
     Animated.timing(rotateAnim, {
-      toValue: shouldRotate ? 90 : 0,
+      toValue: calculateRotationDegree(isLandscape, fullscreen),
       duration: 300,
       useNativeDriver: true,
     }).start();
-  }, [rotateAnim, shouldRotate]);
+  }, [rotateAnim, isLandscape, fullscreen]);
   useEffect(() => {
-    if (prevFullscreen.current !== fullscreen && !isLandscape) {
+    if (fullscreen && !isLandscape) {
       Animated.sequence([
         Animated.timing(opacityAnim, {
           toValue: 0,
@@ -53,29 +57,33 @@ export const useAnimatedFullscreen = (
           toValue: 1,
           duration: 300,
           useNativeDriver: true,
-        })
-      ]).start()
+        }),
+      ]).start();
     }
-  }, [opacityAnim, fullscreen, isLandscape])
+  }, [opacityAnim, fullscreen, isLandscape]);
   useEffect(() => {
-    prevFullscreen.current = fullscreen
-  }, [fullscreen])
+    /**
+     * This useEffect should be called last (Order matters!)
+     * because this useEffect will update the value to latest
+     */
+    prevFullscreen.current = fullscreen;
+  }, [fullscreen]);
   return {
     staticTransform: [
       { translateY: shouldRotate ? (height - width) / 2 : 0 },
       { translateX: shouldRotate ? -(height - width) / 2 : 0 },
       {
-        rotate: shouldRotate ? '90deg' : '0',
+        rotate: `${calculateRotationDegree(isLandscape, fullscreen)}deg`,
       },
     ] as TransformsStyle['transform'],
     animatedTransform: [
       { translateY: shouldRotate ? (height - width) / 2 : 0 },
       { translateX: shouldRotate ? -(height - width) / 2 : 0 },
       {
-        rotate: (rotateAnim.interpolate({
-          inputRange: [0, 90],
-          outputRange: ['0deg', '90deg'],
-        }) as unknown) as string,
+        rotate: rotateAnim.interpolate({
+          inputRange: [-90, 0, 90],
+          outputRange: ['-90deg', '0deg', '90deg'],
+        }),
       },
     ] as TransformsStyle['transform'],
     fullscreenSize: {
@@ -83,7 +91,7 @@ export const useAnimatedFullscreen = (
       height: isLandscape ? width : height,
     },
     animatedOpacity: {
-      opacity: opacityAnim
-    }
+      opacity: opacityAnim,
+    },
   };
 };

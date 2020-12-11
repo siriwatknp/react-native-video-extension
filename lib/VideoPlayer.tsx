@@ -37,11 +37,12 @@ const VideoPlayer = ({ style, videoStyle, ...props }: VideoPlayerProps) => {
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [bufferTime, setBufferTime] = useState(0);
-  const [isLandscape, setIsLandscape] = useState(false);
   const {
     fullscreen,
     enterFullscreen,
     exitFullscreen,
+    isLandscape,
+    setIsLandscape,
     paused,
     setPaused,
     setSeeking,
