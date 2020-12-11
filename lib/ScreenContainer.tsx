@@ -1,12 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import useOrientation, { OrientationValue } from "./OrientationInterface";
+import React, { useState } from 'react';
+import useOrientationEffect from './OrientationInterface';
 
-export type FullscreenOrientation = 'LANDSCAPE-LEFT' | 'LANDSCAPE-RIGHT'
+export type FullscreenOrientation = 'LANDSCAPE-LEFT' | 'LANDSCAPE-RIGHT';
 
 export interface VideoContext {
   fullscreen: FullscreenOrientation | false;
   enterFullscreen: () => void;
   exitFullscreen: () => void;
+  setFullscreen: React.Dispatch<
+    React.SetStateAction<VideoContext['fullscreen']>
+  >;
   seeking: boolean;
   setSeeking: React.Dispatch<React.SetStateAction<boolean>>;
   paused: boolean;
@@ -47,45 +50,23 @@ const isValidConsumer = (
   return typeof children === 'function';
 };
 
-const ScreenContainer = ({ children, config = {} }: ScreenContainerProps) => {
-  const [fullscreen, setFullscreen] = useState<VideoContext['fullscreen']>(false);
+const ScreenContainer = ({
+  children,
+  config = {},
+}: ScreenContainerProps) => {
+  const [fullscreen, setFullscreen] = useState<VideoContext['fullscreen']>(
+    false,
+  );
   const [seeking, setSeeking] = useState(false);
   const [paused, setPaused] = useState(false);
   const [consoleHidden, setConsoleHidden] = useState(true);
   const [isLandscape, setIsLandscape] = useState(true);
-  const Orientation = useOrientation()
-  useEffect(() => {
-    Orientation.lockToPortrait();
-    return () => {
-      Orientation.unlockAllOrientations();
-    }
-  }, [])
-  useEffect(() => {
-    function handleOrientation(orientation: OrientationValue) {
-      if (
-        orientation === 'LANDSCAPE-LEFT' ||
-        orientation === 'LANDSCAPE-RIGHT'
-      ) {
-        setFullscreen(orientation);
-      } else {
-        if ((orientation === 'PORTRAIT' || orientation === 'PORTRAIT-UPSIDEDOWN') && fullscreen && !isLandscape) {
-          // do nothing, keep showing portrait fullscreen
-        } else if (orientation === 'FACE-UP' && fullscreen) {
-          // do nothing, keep showing fullscreen
-        } else {
-          setFullscreen(false);
-        }
-      }
-    }
-    Orientation.addDeviceOrientationListener(handleOrientation);
-    return () => {
-      Orientation.removeDeviceOrientationListener(handleOrientation);
-    };
-  }, [Orientation, isLandscape, fullscreen]);
+  useOrientationEffect({ fullscreen, setFullscreen, isLandscape });
   return (
     <ctx.Provider
       value={{
         fullscreen,
+        setFullscreen,
         enterFullscreen: () => setFullscreen('LANDSCAPE-LEFT'),
         exitFullscreen: () => setFullscreen(false),
         isLandscape,

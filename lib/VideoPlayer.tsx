@@ -1,15 +1,11 @@
 import React, { useRef, useState } from 'react';
-import {
-  Animated,
-  View,
-  ViewProps,
-  TouchableOpacity,
-} from 'react-native';
+import { Animated, View, ViewProps, TouchableOpacity } from 'react-native';
 import Video, { VideoProperties } from 'react-native-video';
 import { useVideoCtx } from './ScreenContainer';
 import Seeker from './Seeker';
-import Overlay from "./Overlay";
+import Overlay from './Overlay';
 import useControllerStyles from './useControllerStyles';
+import usePaused from "./usePause";
 import {
   SvgFullscreen,
   SvgExitFullscreen,
@@ -20,9 +16,10 @@ import {
   SvgRefresh,
 } from '../src/icons';
 
-export interface VideoPlayerProps extends VideoProperties {
+export interface VideoPlayerProps extends Omit<VideoProperties, 'paused'> {
   style?: ViewProps['style'];
   videoStyle?: VideoProperties['style'];
+  initialPaused?: boolean;
 }
 
 // View Hierarchy
@@ -31,19 +28,19 @@ export interface VideoPlayerProps extends VideoProperties {
 //    |  |- RNVideo
 //    |- BgOverlay
 
-const VideoPlayer = ({ style, videoStyle, ...props }: VideoPlayerProps) => {
+const VideoPlayer = ({ initialPaused, style, videoStyle, ...props }: VideoPlayerProps) => {
   let videoInstance = useRef<Video>();
   const [ended, setEnded] = useState(false);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [bufferTime, setBufferTime] = useState(0);
+  const paused = usePaused(initialPaused)
   const {
     fullscreen,
     enterFullscreen,
     exitFullscreen,
     isLandscape,
     setIsLandscape,
-    paused,
     setPaused,
     setSeeking,
   } = useVideoCtx();
@@ -60,15 +57,15 @@ const VideoPlayer = ({ style, videoStyle, ...props }: VideoPlayerProps) => {
             }
           }}
           onEnd={() => {
-            setEnded(true)
+            setEnded(true);
           }}
           onLoad={(data) => {
-            setEnded(false)
+            setEnded(false);
             setDuration(data.duration);
-            setIsLandscape(data.naturalSize.orientation === 'landscape')
+            setIsLandscape(data.naturalSize.orientation === 'landscape');
           }}
           onProgress={(data) => {
-            setEnded(false)
+            setEnded(false);
             setCurrentTime(data.currentTime);
             setBufferTime(data.playableDuration);
           }}
@@ -94,8 +91,8 @@ const VideoPlayer = ({ style, videoStyle, ...props }: VideoPlayerProps) => {
             {ended ? (
               <TouchableOpacity
                 onPress={() => {
-                  videoInstance.current?.seek(0)
-                  setEnded(false)
+                  videoInstance.current?.seek(0);
+                  setEnded(false);
                 }}
                 style={styles.play}
               >
