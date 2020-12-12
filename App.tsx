@@ -30,7 +30,7 @@ import {
   connectUseInsets
 } from './lib';
 
-// connectOrientationLib(Orientation);
+connectOrientationLib(Orientation);
 connectUseInsets(useSafeAreaInsets);
 // Orientation.unlockAllOrientations()
 

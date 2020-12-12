@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { VideoContext } from './ScreenContainer';
-import DimensionManager from "./DimensionManager";
+import { OrientationLocker } from './LayoutCalc';
 
 export type OrientationValue =
   | 'PORTRAIT'
@@ -32,7 +32,7 @@ let OrientationAPI = {
 };
 
 export function connectOrientationLib(ExternalOrientation: OrientationLib) {
-  DimensionManager.isLockedToPortrait = true;
+  OrientationLocker.isPortraitLocked = true;
   OrientationAPI = ExternalOrientation;
 }
 

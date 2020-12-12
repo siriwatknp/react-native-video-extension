@@ -1,41 +1,26 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, useWindowDimensions } from 'react-native';
 import useInsets from './InsetInterface';
-import DimensionManager from './DimensionManager';
 import { useVideoCtx } from './ScreenContainer';
-import {
-  getThumbTopOffset,
-  GUTTER_PERCENT,
-  GUTTER_PX,
-  isZeroInsets,
-} from './utils';
+import { getThumbTopOffset } from './utils';
+import { getSeekerLayout } from './LayoutCalc';
 
 const BOTTOM_OFFSET = 40;
 const THUMB_PADDING = 12;
 
 const useSeekerStyles = () => {
   const { fullscreen, isLandscape, config } = useVideoCtx();
+  const windowSize = useWindowDimensions();
   const insets = useInsets();
+  const seekerLayout = getSeekerLayout(windowSize, {
+    insets,
+    fullscreen: !!fullscreen,
+    isLandscape,
+  });
   return {
     seekbarContainer: StyleSheet.flatten([
       styles.seekbar,
       fullscreen && styles.fullscreenSeekbar,
-      {
-        width: DimensionManager.getSeekerWidth({
-          insets,
-          fullscreen: !!fullscreen,
-          isLandscape,
-          gutter: !insets && isLandscape ? GUTTER_PERCENT : GUTTER_PX, // 5 is percentage
-        }),
-      },
-      fullscreen && {
-        marginLeft: !isLandscape
-          ? GUTTER_PX
-          : !insets
-          ? `${GUTTER_PERCENT}%`
-          : isZeroInsets(insets)
-          ? GUTTER_PX
-          : 0,
-      },
+      seekerLayout,
     ]),
     seekbarProgress: StyleSheet.flatten([
       styles.seekbarProgress,

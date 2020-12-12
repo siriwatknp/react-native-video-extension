@@ -1,5 +1,5 @@
 import { VideoContext } from './ScreenContainer';
-import { Inset } from './DimensionManager';
+import { Inset } from './LayoutCalc';
 
 const HOUR = 60 * 60;
 const MINUTE = 60;

@@ -1,14 +1,15 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, useWindowDimensions } from 'react-native';
 import { useAnimatedFullscreen } from './animation';
 import { useVideoCtx } from './ScreenContainer';
 import { AspectRatio } from './utils';
-import DimensionManager from './DimensionManager';
 import useInsets from './InsetInterface';
+import { getPlayerSize } from './LayoutCalc';
 
 const useControllerStyles = (
   aspectRatio: AspectRatio,
   isLandscape: boolean,
 ) => {
+  const windowSize = useWindowDimensions();
   const insets = useInsets();
   const { fullscreen } = useVideoCtx();
   const {
@@ -29,10 +30,11 @@ const useControllerStyles = (
         transform: animatedTransform,
       },
       animatedOpacity,
-      DimensionManager.getPlayerSize({
+      getPlayerSize(windowSize, {
         insets,
         fullscreen: !!fullscreen,
         isLandscape,
+        aspectRatio,
       }),
     ]),
     video: {
