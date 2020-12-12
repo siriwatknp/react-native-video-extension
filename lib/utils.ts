@@ -1,7 +1,13 @@
 import { VideoContext } from './ScreenContainer';
+import { Inset } from './DimensionManager';
 
 const HOUR = 60 * 60;
 const MINUTE = 60;
+export const GUTTER_PERCENT = 5;
+export const GUTTER_PX = 16;
+
+export const isZeroInsets = (insets: Partial<Inset>) =>
+  Object.entries(insets).every(([, value]) => value === 0);
 
 const twoChar = (number: number): string =>
   Math.floor(number).toString().length === 1

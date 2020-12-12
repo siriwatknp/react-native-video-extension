@@ -1,12 +1,15 @@
 import { StyleSheet } from 'react-native';
 import { useAnimatedFullscreen } from './animation';
 import { useVideoCtx } from './ScreenContainer';
-import { getAspectRatio, AspectRatio } from './utils';
+import { AspectRatio } from './utils';
+import DimensionManager from './DimensionManager';
+import useInsets from './InsetInterface';
 
 const useControllerStyles = (
   aspectRatio: AspectRatio,
   isLandscape: boolean,
 ) => {
+  const insets = useInsets();
   const { fullscreen } = useVideoCtx();
   const {
     animatedTransform,
@@ -21,23 +24,21 @@ const useControllerStyles = (
     ]),
     controller: StyleSheet.flatten([
       styles.controller,
-      fullscreen && {
-        ...fullscreenSize,
-        ...styles.fullscreenController,
-      },
+      fullscreen && styles.fullscreenController,
       {
         transform: animatedTransform,
       },
       animatedOpacity,
+      DimensionManager.getPlayerSize({
+        insets,
+        fullscreen: !!fullscreen,
+        isLandscape,
+      }),
     ]),
-    video: StyleSheet.flatten([
-      fullscreen
-        ? styles.fullscreenVideo
-        : {
-            ...styles.initialVideo,
-            aspectRatio: getAspectRatio(aspectRatio),
-          },
-    ]),
+    video: {
+      width: '100%',
+      height: '100%',
+    },
     playerBg: StyleSheet.flatten([
       styles.playerBg,
       fullscreen
@@ -49,7 +50,7 @@ const useControllerStyles = (
     ]),
     fullscreenToggle: {
       ...styles.fullscreenToggle,
-      ...(fullscreen && { bottom: 56, right: 32 }),
+      ...(fullscreen && { bottom: 56 }),
     },
     play: fullscreen ? styles.playFullscreen : styles.play,
   };
@@ -84,10 +85,6 @@ const styles = StyleSheet.create({
   fullscreenBgOverlay: {
     top: 0,
     left: 0,
-  },
-  initialVideo: {
-    height: undefined,
-    maxWidth: '100%',
   },
   fullscreenVideo: {
     width: '100%',

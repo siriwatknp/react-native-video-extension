@@ -16,12 +16,21 @@
     "publish-package": "node scripts/pkg.js && cd dist && yarn publish"
   },
   "dependencies": {
+    "@react-native-community/masked-view": "^0.1.10",
+    "@react-navigation/native": "^5.8.10",
+    "@react-navigation/stack": "^5.12.8",
     "@types/react-native-video": "5.0.3",
+    "add": "^2.0.6",
     "react": "16.13.1",
     "react-native": "0.63.3",
+    "react-native-gesture-handler": "^1.9.0",
     "react-native-orientation-locker": "^1.2.0",
+    "react-native-reanimated": "^1.13.2",
+    "react-native-safe-area-context": "^3.1.9",
+    "react-native-screens": "^2.16.1",
     "react-native-svg": "12.1.0",
-    "react-native-video": "5.1.0-alpha8"
+    "react-native-video": "5.1.0-alpha8",
+    "yarn": "^1.22.10"
   },
   "devDependencies": {
     "@babel/core": "^7.8.4",

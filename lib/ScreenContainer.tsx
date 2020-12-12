@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import useOrientationEffect from './OrientationInterface';
+import {StatusBar} from "react-native";
 
 export type FullscreenOrientation = 'LANDSCAPE-LEFT' | 'LANDSCAPE-RIGHT';
 
@@ -62,6 +63,13 @@ const ScreenContainer = ({
   const [consoleHidden, setConsoleHidden] = useState(true);
   const [isLandscape, setIsLandscape] = useState(true);
   useOrientationEffect({ fullscreen, setFullscreen, isLandscape });
+  useEffect(() => {
+    if (fullscreen) {
+      StatusBar.setHidden(true)
+    } else {
+      StatusBar.setHidden(false)
+    }
+  }, [fullscreen])
   return (
     <ctx.Provider
       value={{

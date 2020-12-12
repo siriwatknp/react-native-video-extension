@@ -115,7 +115,7 @@ const Seeker = ({
   ).current;
   return (
     <Animated.View
-      style={StyleSheet.flatten([styles.seekbarBg, { opacity: barOpacity }])}
+      style={StyleSheet.flatten([styles.seekbarContainer, { opacity: barOpacity }])}
       onLayout={(e) => {
         setSeekerWidth(e.nativeEvent.layout.width);
       }}

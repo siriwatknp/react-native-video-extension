@@ -1,22 +1,50 @@
 import { StyleSheet } from 'react-native';
+import useInsets from './InsetInterface';
+import DimensionManager from './DimensionManager';
 import { useVideoCtx } from './ScreenContainer';
-import { getThumbTopOffset } from './utils';
+import {
+  getThumbTopOffset,
+  GUTTER_PERCENT,
+  GUTTER_PX,
+  isZeroInsets,
+} from './utils';
 
 const BOTTOM_OFFSET = 40;
 const THUMB_PADDING = 12;
 
 const useSeekerStyles = () => {
-  const { fullscreen, config } = useVideoCtx();
+  const { fullscreen, isLandscape, config } = useVideoCtx();
+  const insets = useInsets();
   return {
-    seekbarBg: StyleSheet.flatten([
-      fullscreen ? styles.fullscreenSeekbar : styles.seekbar,
-      styles.seekbarBg,
+    seekbarContainer: StyleSheet.flatten([
+      styles.seekbar,
+      fullscreen && styles.fullscreenSeekbar,
+      {
+        width: DimensionManager.getSeekerWidth({
+          insets,
+          fullscreen: !!fullscreen,
+          isLandscape,
+          gutter: !insets && isLandscape ? GUTTER_PERCENT : GUTTER_PX, // 5 is percentage
+        }),
+      },
+      fullscreen && {
+        marginLeft: !isLandscape
+          ? GUTTER_PX
+          : !insets
+          ? `${GUTTER_PERCENT}%`
+          : isZeroInsets(insets)
+          ? GUTTER_PX
+          : 0,
+      },
     ]),
     seekbarProgress: StyleSheet.flatten([
       styles.seekbarProgress,
       { backgroundColor: config.seekerColor },
     ]),
-    seekbarTime: styles.seekbarTime,
+    seekbarTime: {
+      ...styles.seekbarTime,
+      ...(fullscreen && styles.seekbarTimeFullscreen),
+    },
     seekbarBuffer: styles.seekbarBuffer,
     time: styles.time,
     seekerThumbRing: StyleSheet.flatten([
@@ -28,7 +56,7 @@ const useSeekerStyles = () => {
           config.thumbRadius + THUMB_PADDING,
         ),
         left: -config.thumbRadius - THUMB_PADDING,
-      }
+      },
     ]),
     seekerThumbRingTouched: {
       top: getThumbTopOffset(
@@ -57,18 +85,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     height: 2,
-    width: '100%',
-  },
-  fullscreenSeekbar: {
-    position: 'absolute',
-    bottom: BOTTOM_OFFSET,
-    height: 4,
-    width: '90%',
-    left: '5%',
-  },
-  seekbarBg: {
     backgroundColor: 'rgba(255,255,255,0.38)',
     zIndex: 1,
+  },
+  fullscreenSeekbar: {
+    bottom: BOTTOM_OFFSET,
+    height: 4,
   },
   seekbarProgress: {
     // @ts-ignore
@@ -86,6 +108,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 16,
     flexDirection: 'row',
+  },
+  seekbarTimeFullscreen: {
+    left: 0,
+    bottom: 20,
   },
   time: {
     fontSize: 14,

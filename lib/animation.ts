@@ -29,13 +29,13 @@ export const useOpacity = (hidden: boolean) => {
   return opacityAnim;
 };
 
+// todo: split to useFullscreenRotation & useFullscreenOpacity
 export const useAnimatedFullscreen = (
   fullscreen: VideoContext['fullscreen'],
   isLandscape: boolean,
 ) => {
   const shouldRotate = isLandscape && fullscreen;
   const { width, height } = portraitDimension;
-  const prevFullscreen = useRef(fullscreen);
   const rotateAnim = useRef(new Animated.Value(0)).current;
   const opacityAnim = useRef(new Animated.Value(1)).current;
   useEffect(() => {
@@ -61,13 +61,6 @@ export const useAnimatedFullscreen = (
       ]).start();
     }
   }, [opacityAnim, fullscreen, isLandscape]);
-  useEffect(() => {
-    /**
-     * This useEffect should be called last (Order matters!)
-     * because this useEffect will update the value to latest
-     */
-    prevFullscreen.current = fullscreen;
-  }, [fullscreen]);
   return {
     staticTransform: [
       { translateY: shouldRotate ? (height - width) / 2 : 0 },
