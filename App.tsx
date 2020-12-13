@@ -27,12 +27,12 @@ import {
   ScreenContainer,
   FullscreenHidden,
   connectOrientationLib,
-  connectUseInsets
+  connectUseInsets,
 } from './lib';
 
 connectOrientationLib(Orientation);
 connectUseInsets(useSafeAreaInsets);
-// Orientation.unlockAllOrientations()
+// Orientation.unlockAllOrientations();
 
 const App = () => {
   const [isLandscape, setIsLandscape] = useState(false);

@@ -1,8 +1,11 @@
 import { useEffect, useRef } from 'react';
 import { Animated, TransformsStyle, useWindowDimensions } from 'react-native';
-import { calculateRotationDegree } from './utils';
 import { VideoContext } from './ScreenContainer';
-import { Device, getPlayerRotationDegree } from './LayoutCalc';
+import {
+  Device,
+  getPlayerRotationDegree,
+  getPlayerTranslate2D,
+} from './LayoutCalc';
 
 export const useScaleSpring = (hidden: boolean) => {
   const scaleAnim = useRef(new Animated.Value(hidden ? 0 : 1)).current;
@@ -33,21 +36,25 @@ export const useAnimatedFullscreen = (
   fullscreen: VideoContext['fullscreen'],
   isLandscape: boolean,
 ) => {
-  const shouldRotate = isLandscape && fullscreen;
   const windowSize = useWindowDimensions();
   const { width, height } = Device(windowSize);
   const rotateAnim = useRef(new Animated.Value(0)).current;
   const opacityAnim = useRef(new Animated.Value(1)).current;
+  const translate = getPlayerTranslate2D(windowSize, {
+    fullscreen: !!fullscreen,
+    isLandscape,
+  });
+  const rotate = getPlayerRotationDegree(windowSize, { isLandscape, fullscreen })
   useEffect(() => {
     Animated.timing(rotateAnim, {
-      toValue: getPlayerRotationDegree(windowSize, { isLandscape, fullscreen }),
+      toValue: rotate,
       duration: 300,
       useNativeDriver: true,
     }).start();
-  }, [rotateAnim, isLandscape, fullscreen]);
+  }, [rotateAnim, rotate]);
   useEffect(() => {
     if (fullscreen && !isLandscape) {
-      opacityAnim.setValue(0)
+      opacityAnim.setValue(0);
       Animated.timing(opacityAnim, {
         toValue: 1,
         duration: 300,
@@ -57,15 +64,13 @@ export const useAnimatedFullscreen = (
   }, [opacityAnim, fullscreen, isLandscape]);
   return {
     staticTransform: [
-      { translateY: shouldRotate ? (height - width) / 2 : 0 },
-      { translateX: shouldRotate ? -(height - width) / 2 : 0 },
+      ...translate,
       {
-        rotate: `${calculateRotationDegree(isLandscape, fullscreen)}deg`,
+        rotate: `${rotate}deg`,
       },
     ] as TransformsStyle['transform'],
     animatedTransform: [
-      { translateY: shouldRotate ? (height - width) / 2 : 0 },
-      { translateX: shouldRotate ? -(height - width) / 2 : 0 },
+      ...translate,
       {
         rotate: rotateAnim.interpolate({
           inputRange: [-90, 0, 90],

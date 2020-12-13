@@ -83,10 +83,24 @@ export const Gap = ({ insets, fullscreen, isLandscape }: Info) => {
 export const getPlayerWidth = (windowSize: WindowDimension, info: Info) => {
   const gap = Gap(info);
   const device = Device(windowSize);
-  const { isLandscape, fullscreen } = info;
-  return isLandscape && fullscreen
-    ? device.height - gap.left - gap.right
-    : device.width;
+  const { isLandscape: isLandscapeVideo, fullscreen } = info;
+  if (OrientationLocker.isPortraitLocked) {
+    return isLandscapeVideo && fullscreen
+      ? device.height - gap.left - gap.right
+      : device.width;
+  }
+  if (fullscreen) {
+    const isLandscapeDevice = windowSize.width > windowSize.height;
+    if (isLandscapeDevice) {
+      return isLandscapeVideo
+        ? device.height - gap.left - gap.right
+        : device.width;
+    }
+    return isLandscapeVideo
+      ? device.height - gap.top - gap.bottom
+      : device.width;
+  }
+  return windowSize.width;
 };
 
 export const getPlayerHeight = (
@@ -96,26 +110,54 @@ export const getPlayerHeight = (
   const gap = Gap(info);
   const device = Device(windowSize);
   const { isLandscape, fullscreen, aspectRatio } = info;
+  if (OrientationLocker.isPortraitLocked) {
+    if (fullscreen) {
+      return isLandscape ? device.width : device.height - gap.top - gap.bottom;
+    }
+    return device.width / getAspectRatio(aspectRatio);
+  }
   if (fullscreen) {
     return isLandscape ? device.width : device.height - gap.top - gap.bottom;
   }
-  return device.width / getAspectRatio(aspectRatio);
+  return windowSize.width / getAspectRatio(aspectRatio);
 };
 
 export const getPlayerSize = (
   windowSize: WindowDimension,
   info: Info & { aspectRatio: AspectRatio },
 ) => {
-  const gap = Gap(info);
   const width = getPlayerWidth(windowSize, info);
   const height = getPlayerHeight(windowSize, info);
-  const { isLandscape, fullscreen } = info;
   return {
     width,
     height,
-    marginTop: fullscreen && !isLandscape ? gap.top : 0,
-    marginLeft: fullscreen && isLandscape ? (gap.left + gap.right) / 2 : 0,
+    ...getPlayerMargin(windowSize, info),
   };
+};
+
+export const getPlayerMargin = (windowSize: WindowDimension, info: Info) => {
+  const { fullscreen, isLandscape } = info;
+  const isLandscapeDevice = windowSize.width > windowSize.height;
+  const gap = Gap(info);
+  if (OrientationLocker.isPortraitLocked) {
+    return {
+      marginTop: fullscreen && !isLandscape ? gap.top : 0,
+      marginLeft: fullscreen && isLandscape ? (gap.left + gap.right) / 2 : 0,
+    };
+  }
+  if (fullscreen) {
+    if (isLandscapeDevice) {
+      return {
+        marginTop: !isLandscape ? (gap.top + gap.bottom) / 2 : 0,
+        marginLeft: isLandscape ? (gap.left + gap.right) / 2 : 0,
+      };
+    }
+    return {
+      marginTop: !isLandscape ? (gap.top + gap.bottom) / 2 : 0,
+      marginLeft: isLandscape ? (gap.top + gap.bottom) / 2 : 0,
+    };
+  }
+  return {};
 };
 
 export const getPlayerRotationDegree = (
@@ -133,6 +175,36 @@ export const getPlayerRotationDegree = (
     return windowSize.height > windowSize.width ? 90 : 0;
   }
   return windowSize.height > windowSize.width ? 0 : 90;
+};
+
+export const getPlayerTranslate2D = (
+  windowSize: WindowDimension,
+  info: Pick<Info, 'fullscreen' | 'isLandscape'>,
+) => {
+  const device = Device(windowSize);
+  const { isLandscape: isLandscapeVideo, fullscreen } = info;
+  const shouldRotate = isLandscapeVideo && fullscreen;
+  const offset = (device.height - device.width) / 2;
+  if (OrientationLocker.isPortraitLocked) {
+    return [
+      { translateY: shouldRotate ? offset : 0 },
+      { translateX: shouldRotate ? -offset : 0 },
+    ];
+  }
+  if (fullscreen) {
+    const isLandscapeDevice = windowSize.width > windowSize.height;
+    if (isLandscapeDevice) {
+      return [
+        { translateY: isLandscapeVideo ? 0 : -offset },
+        { translateX: isLandscapeVideo ? 0 : offset },
+      ];
+    }
+    return [
+      { translateY: isLandscapeVideo ? offset : 0 },
+      { translateX: isLandscapeVideo ? -offset : 0 },
+    ];
+  }
+  return [];
 };
 
 export const getSeekerWidth = (

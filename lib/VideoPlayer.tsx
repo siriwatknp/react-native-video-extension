@@ -83,6 +83,7 @@ const VideoPlayer = ({
           }}
           paused={paused}
           controls={false}
+          resizeMode={'contain'}
         />
         <Overlay>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -139,6 +140,7 @@ const VideoPlayer = ({
           duration={duration}
           currentTime={currentTime}
           bufferTime={bufferTime}
+          isLandscapeVideo={isLandscape}
           vertical={fullscreen && isLandscape}
         />
       </Animated.View>

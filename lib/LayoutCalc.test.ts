@@ -5,6 +5,7 @@ import {
   getPlayerSize,
   getSeekerWidth,
 } from './LayoutCalc';
+import {GUTTER_PX} from "./utils";
 
 describe('LayoutCalc', () => {
   beforeEach(() => {
@@ -83,8 +84,6 @@ describe('LayoutCalc', () => {
         ).toEqual({
           width: 400,
           height: (400 * 9) / 16,
-          marginLeft: 0,
-          marginTop: 0,
         });
       });
 
@@ -127,6 +126,7 @@ describe('LayoutCalc', () => {
 
     describe('Phone with insets (ex. >=iPhone11)', () => {
       it('fullscreen portrait', () => {
+        OrientationLocker.isPortraitLocked = true;
         expect(
           getPlayerSize(
             { width: 400, height: 800 },
@@ -188,7 +188,7 @@ describe('LayoutCalc', () => {
             isLandscape: false,
           },
         ),
-      ).toEqual(400 - 16 - 16);
+      ).toEqual(400 - GUTTER_PX - GUTTER_PX);
     });
 
     it('fullscreen landscape', () => {
@@ -220,7 +220,7 @@ describe('LayoutCalc', () => {
             isLandscape: true,
           },
         ),
-      ).toEqual(800 - 16 - 16);
+      ).toEqual(800 - GUTTER_PX - GUTTER_PX);
     });
   });
 });

@@ -6,12 +6,14 @@ import {
   Animated,
   PanResponder,
   PanResponderGestureState,
+  useWindowDimensions,
 } from 'react-native';
 import Video from 'react-native-video';
-import useSeekerStyles from "./useSeekerStyles";
+import useSeekerStyles from './useSeekerStyles';
 import { toTimeView, getSecondsToSeek, getThumbPosition } from './utils';
 import { useVideoCtx } from './ScreenContainer';
 import { useOpacity, useScaleSpring } from './animation';
+import { OrientationLocker } from './LayoutCalc';
 
 export type SeekerProps = {
   currentTime: number;
@@ -19,6 +21,7 @@ export type SeekerProps = {
   bufferTime: number;
   vertical: boolean;
   videoInstance?: Video;
+  isLandscapeVideo: boolean;
 };
 
 const Seeker = ({
@@ -27,6 +30,7 @@ const Seeker = ({
   bufferTime,
   videoInstance,
   vertical,
+  isLandscapeVideo,
 }: SeekerProps) => {
   const styles = useSeekerStyles();
   const {
@@ -38,6 +42,7 @@ const Seeker = ({
     consoleHidden,
     config,
   } = useVideoCtx();
+  const windowSize = useWindowDimensions();
   const timeOpacity = useOpacity(consoleHidden);
   const barOpacity = useOpacity(consoleHidden && !!fullscreen);
   const scaleAnim = useScaleSpring(consoleHidden);
@@ -68,15 +73,21 @@ const Seeker = ({
     seekerWidth,
     videoInstance,
     vertical,
+    fullscreen,
     paused,
     pausedOnRelease: false,
+    isLandscapeDevice: false,
+    isLandscapeVideo,
   }).current;
   seekerRef.videoInstance = videoInstance;
   seekerRef.duration = duration;
   seekerRef.seekerWidth = seekerWidth;
   seekerRef.vertical = vertical;
+  seekerRef.fullscreen = fullscreen;
   seekerRef.paused = paused;
   seekerRef.position = position;
+  seekerRef.isLandscapeDevice = windowSize.width > windowSize.height;
+  seekerRef.isLandscapeVideo = isLandscapeVideo;
   if (!seeking) {
     seekerRef.currentTime = currentTime;
   }
@@ -85,13 +96,25 @@ const Seeker = ({
       seekerRef.duration,
       seekerRef.currentTime,
       seekerRef.seekerWidth,
-      seekerRef.vertical ? gestureState.dy : gestureState.dx,
+      getDiff(gestureState),
       8,
     );
     if (seekerRef.videoInstance) {
       seekerRef.videoInstance.seek(seconds);
     }
   };
+  function getDiff(gestureState: PanResponderGestureState) {
+    if (OrientationLocker.isPortraitLocked) {
+      return seekerRef.vertical ? gestureState.dy : gestureState.dx;
+    }
+    if (!seekerRef.fullscreen) {
+      return gestureState.dx
+    }
+    if (seekerRef.isLandscapeDevice) {
+      return seekerRef.isLandscapeVideo ? gestureState.dx : gestureState.dy;
+    }
+    return seekerRef.isLandscapeVideo ? gestureState.dy : gestureState.dx;
+  }
   const panResponder = useRef(
     PanResponder.create({
       onMoveShouldSetPanResponder: () => true,
@@ -102,10 +125,7 @@ const Seeker = ({
         seekerRef.pausedOnRelease = seekerRef.paused;
       },
       onPanResponderMove: (e, gestureState) => {
-        pan.setValue(
-          seekerRef.position +
-            (seekerRef.vertical ? gestureState.dy : gestureState.dx),
-        );
+        pan.setValue(seekerRef.position + getDiff(gestureState));
       },
       onPanResponderRelease: (e, gestureState) => {
         handleSeek(gestureState);
@@ -115,7 +135,10 @@ const Seeker = ({
   ).current;
   return (
     <Animated.View
-      style={StyleSheet.flatten([styles.seekbarContainer, { opacity: barOpacity }])}
+      style={StyleSheet.flatten([
+        styles.seekbarContainer,
+        { opacity: barOpacity },
+      ])}
       onLayout={(e) => {
         setSeekerWidth(e.nativeEvent.layout.width);
       }}
