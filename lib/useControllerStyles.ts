@@ -62,10 +62,12 @@ const useControllerStyles = (
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#000',
-    zIndex: 1,
+    zIndex: 1000,
+    overflow: 'visible'
   },
   initialContainer: {
     width: '100%',
+    overflow: 'visible'
   },
   fullscreenContainer: {
     position: 'absolute',
@@ -74,7 +76,7 @@ const styles = StyleSheet.create({
     left: 0,
   },
   controller: {
-    zIndex: 1,
+    zIndex: 1000,
   },
   fullscreenController: {
     position: 'absolute',

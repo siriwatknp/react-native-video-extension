@@ -16,9 +16,13 @@ import {
   Text,
   StatusBar,
   Button,
+  TouchableOpacity,
 } from 'react-native';
 import Orientation from 'react-native-orientation-locker';
-import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+  SafeAreaProvider,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 
 declare const global: { HermesInternal: null | {} };
 
@@ -76,10 +80,17 @@ const App = () => {
                   </Text>
                 </View>
               </View>
-              <Button
+              <TouchableOpacity
+                style={{
+                  padding: 8,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: '#e9e9e9',
+                }}
                 onPress={() => setIsLandscape((bool) => !bool)}
-                title={`Switch to ${isLandscape ? 'Portrait' : 'Landscape'}`}
-              />
+              >
+                <Text>Switch to {isLandscape ? 'Portrait' : 'Landscape'}</Text>
+              </TouchableOpacity>
               <VideoPlayer
                 muted
                 initialPaused

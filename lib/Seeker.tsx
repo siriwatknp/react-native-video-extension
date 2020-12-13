@@ -108,7 +108,7 @@ const Seeker = ({
       return seekerRef.vertical ? gestureState.dy : gestureState.dx;
     }
     if (!seekerRef.fullscreen) {
-      return gestureState.dx
+      return gestureState.dx;
     }
     if (seekerRef.isLandscapeDevice) {
       return seekerRef.isLandscapeVideo ? gestureState.dx : gestureState.dy;
@@ -134,64 +134,68 @@ const Seeker = ({
     }),
   ).current;
   return (
-    <Animated.View
-      style={StyleSheet.flatten([
-        styles.seekbarContainer,
-        { opacity: barOpacity },
-      ])}
-      onLayout={(e) => {
-        setSeekerWidth(e.nativeEvent.layout.width);
-      }}
-    >
+    <>
       <Animated.View
-        style={{
-          ...styles.seekerThumbRing,
-          ...(seeking && styles.seekerThumbRingTouched),
-          transform: [{ translateX: seeking ? pan : position }],
+        style={StyleSheet.flatten([
+          styles.seekbarContainer,
+          { opacity: barOpacity },
+        ])}
+        onLayout={(e) => {
+          setSeekerWidth(e.nativeEvent.layout.width);
         }}
-        {...panResponder.panHandlers}
       >
         <Animated.View
-          style={{
-            ...styles.seekbarThumb,
-            ...(seeking && styles.seekbarThumbTouched),
-            transform: [{ scale: scaleAnim }],
-          }}
-        />
-      </Animated.View>
-      <Animated.View
-        style={StyleSheet.flatten([
-          styles.seekbarTime,
-          { opacity: timeOpacity },
-        ])}
-      >
-        <Text style={styles.time}>{toTimeView(currentTime)}</Text>
-        <Text
           style={StyleSheet.flatten([
-            styles.time,
-            { color: '#c4c4c4', marginLeft: 5 },
+            styles.seekbarTime,
+            { opacity: timeOpacity },
           ])}
         >
-          / {toTimeView(duration)}
-        </Text>
+          <Text style={styles.time}>{toTimeView(currentTime)}</Text>
+          <Text
+            style={StyleSheet.flatten([
+              styles.time,
+              { color: '#c4c4c4', marginLeft: 5 },
+            ])}
+          >
+            / {toTimeView(duration)}
+          </Text>
+        </Animated.View>
+        <View
+          style={StyleSheet.flatten([
+            styles.seekbarProgress,
+            {
+              width: position,
+            },
+          ])}
+        />
+        <View
+          style={StyleSheet.flatten([
+            styles.seekbarBuffer,
+            {
+              width: bufferPosition,
+            },
+          ])}
+        />
       </Animated.View>
-      <View
-        style={StyleSheet.flatten([
-          styles.seekbarProgress,
-          {
-            width: position,
-          },
-        ])}
-      />
-      <View
-        style={StyleSheet.flatten([
-          styles.seekbarBuffer,
-          {
-            width: bufferPosition,
-          },
-        ])}
-      />
-    </Animated.View>
+      <View style={styles.seekerThumbWrapper}>
+        <Animated.View
+          style={{
+            ...styles.seekerThumbRing,
+            ...(seeking && styles.seekerThumbRingTouched),
+            transform: [{ translateX: seeking ? pan : position }],
+          }}
+          {...panResponder.panHandlers}
+        >
+          <Animated.View
+            style={{
+              ...styles.seekbarThumb,
+              ...(seeking && styles.seekbarThumbTouched),
+              transform: [{ scale: scaleAnim }],
+            }}
+          />
+        </Animated.View>
+      </View>
+    </>
   );
 };
 

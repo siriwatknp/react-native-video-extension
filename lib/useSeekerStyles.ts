@@ -32,22 +32,26 @@ const useSeekerStyles = () => {
     },
     seekbarBuffer: styles.seekbarBuffer,
     time: styles.time,
+    seekerThumbWrapper: StyleSheet.flatten([
+      styles.seekerThumbWrapper,
+      seekerLayout,
+      {
+        bottom: getThumbTopOffset(
+          config.seekerThickness,
+          config.thumbRadius + THUMB_PADDING,
+        ),
+      },
+      fullscreen && { bottom: BOTTOM_OFFSET },
+    ]),
     seekerThumbRing: StyleSheet.flatten([
       styles.seekerThumbRing,
       {
         padding: THUMB_PADDING,
-        top: getThumbTopOffset(
-          config.seekerThickness,
-          config.thumbRadius + THUMB_PADDING,
-        ),
         left: -config.thumbRadius - THUMB_PADDING,
       },
     ]),
     seekerThumbRingTouched: {
-      top: getThumbTopOffset(
-        config.seekerThickness,
-        config.thumbTouchedRadius + THUMB_PADDING,
-      ),
+      top: (config.thumbRadius - config.thumbTouchedRadius),
       left: -config.thumbTouchedRadius - THUMB_PADDING,
     },
     seekbarThumb: StyleSheet.flatten([
@@ -102,6 +106,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
     color: '#fff',
+  },
+  seekerThumbWrapper: {
+    position: 'absolute',
+    zIndex: 10,
+    bottom: 0,
+    height: 40,
   },
   seekerThumbRing: {
     position: 'absolute',
