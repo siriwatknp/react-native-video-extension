@@ -16,7 +16,7 @@ import {
   Text,
   StatusBar,
   Button,
-  TouchableOpacity,
+  TouchableOpacity, useWindowDimensions,
 } from 'react-native';
 import Orientation from 'react-native-orientation-locker';
 import {
@@ -34,12 +34,13 @@ import {
   connectUseInsets,
 } from './lib';
 
-connectOrientationLib(Orientation);
+// connectOrientationLib(Orientation);
 connectUseInsets(useSafeAreaInsets);
-// Orientation.unlockAllOrientations();
+Orientation.unlockAllOrientations();
 
 const App = () => {
   const [isLandscape, setIsLandscape] = useState(false);
+  const { width, height } = useWindowDimensions()
   return (
     <SafeAreaProvider>
       <ScreenContainer>
@@ -54,6 +55,7 @@ const App = () => {
             <ScrollView
               scrollEnabled={!fullscreen && !seeking}
               style={styles.scrollView}
+              contentContainerStyle={fullscreen && { width, height }}
             >
               <View
                 style={{

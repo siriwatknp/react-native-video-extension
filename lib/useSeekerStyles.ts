@@ -41,7 +41,7 @@ const useSeekerStyles = () => {
           config.thumbRadius + THUMB_PADDING,
         ),
       },
-      fullscreen && { bottom: BOTTOM_OFFSET },
+      fullscreen && { bottom: (BOTTOM_OFFSET + 4) / 2 },
     ]),
     seekerThumbRing: StyleSheet.flatten([
       styles.seekerThumbRing,
