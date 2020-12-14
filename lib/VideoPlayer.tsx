@@ -2,7 +2,8 @@ import React, { useRef, useState } from 'react';
 import { Animated, View, ViewProps, TouchableOpacity } from 'react-native';
 import Video, { VideoProperties } from 'react-native-video';
 import { useVideoCtx } from './ScreenContainer';
-import Seeker from './Seeker';
+// import Seeker from './Seeker';
+import Seeker from './Seeker/Seeker';
 import Overlay from './Overlay';
 import useControllerStyles from './useControllerStyles';
 import usePaused from './usePause';
@@ -43,6 +44,7 @@ const VideoPlayer = ({
   const [currentTime, setCurrentTime] = useState(0);
   const [bufferTime, setBufferTime] = useState(0);
   const paused = usePaused(initialPaused);
+  const prevPaused = useRef(paused);
   const {
     fullscreen,
     enterFullscreen,
@@ -136,13 +138,34 @@ const VideoPlayer = ({
           </TouchableOpacity>
         </Overlay>
         <Seeker
-          videoInstance={videoInstance.current}
-          duration={duration}
-          currentTime={currentTime}
-          bufferTime={bufferTime}
-          isLandscapeVideo={isLandscape}
-          vertical={fullscreen && isLandscape}
+          progress={duration ? currentTime / duration : 0}
+          buffer={duration ? bufferTime / duration : 0}
+          onSeek={(data) => {
+            console.log('data', data);
+            if (data.eventName === 'GRANT') {
+              // videoInstance.current?.seek(duration * data.ratio)
+              setCurrentTime(duration * data.ratio)
+              prevPaused.current = paused
+              setPaused(true)
+            }
+            if (data.eventName === 'MOVE') {
+              // videoInstance.current?.seek(duration * data.ratio)
+              // setCurrentTime(duration * data.ratio)
+            }
+            if (data.eventName === 'RELEASE') {
+              videoInstance.current?.seek(duration * data.ratio)
+              setPaused(prevPaused.current)
+            }
+          }}
         />
+        {/*<Seeker*/}
+        {/*  videoInstance={videoInstance.current}*/}
+        {/*  duration={duration}*/}
+        {/*  currentTime={currentTime}*/}
+        {/*  bufferTime={bufferTime}*/}
+        {/*  isLandscapeVideo={isLandscape}*/}
+        {/*  vertical={fullscreen && isLandscape}*/}
+        {/*/>*/}
       </Animated.View>
       <View style={styles.playerBg} />
     </View>

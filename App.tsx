@@ -23,6 +23,7 @@ import {
   SafeAreaProvider,
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
+import Seeker from "./lib/Seeker/Seeker";
 
 declare const global: { HermesInternal: null | {} };
 
@@ -53,7 +54,8 @@ const App = () => {
               </View>
             </FullscreenHidden>
             <ScrollView
-              scrollEnabled={!fullscreen && !seeking}
+              // scrollEnabled={!fullscreen && !seeking}
+              scrollEnabled={false}
               style={styles.scrollView}
               contentContainerStyle={fullscreen && { width, height }}
             >
@@ -110,6 +112,9 @@ const App = () => {
                 <Text style={{ color: 'rgba(0,0,0,0.6)' }}>
                   1.2B views • just now
                 </Text>
+              </View>
+              <View style={{ backgroundColor: '#e9e9e9', height: 100, width: '100%' }}>
+                {/*<Seeker onSeek={console.log} />*/}
               </View>
               {global.HermesInternal == null ? null : (
                 <View style={styles.engine}>
