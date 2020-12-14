@@ -19,6 +19,13 @@ export type SeekerProps = {
     width: number;
     ratio: number;
   }) => void;
+  paused?: boolean;
+};
+
+const within = (min: number, number: number, max: number) => {
+  if (number < min) return min;
+  if (number > max) return max;
+  return number;
 };
 
 const DEFAULT_COLOR = '#ff2525';
@@ -26,33 +33,38 @@ const THUMB_SIZE = 40;
 const BAR_HEIGHT = 2;
 const INITIAL_BUTTON_SIZE = 16;
 const TOUCHED_BUTTON_SIZE = 24;
-const bundleData = (totalWidth: number, x: number) => ({
-  x,
-  width: totalWidth,
-  ratio: x / totalWidth,
-});
 const Seeker = ({
   filledColor = DEFAULT_COLOR,
   buttonColor = DEFAULT_COLOR,
   progress = 0, // in ratio
   buffer = 0,
   onSeek,
+  paused,
 }: SeekerProps) => {
   const [seeking, setSeeking] = useState(false);
   const [seekerWidth, setSeekerWidth] = useState(0);
-  console.log('seekerWidth', seekerWidth);
   const offset = INITIAL_BUTTON_SIZE / 2;
   const totalWidth = Math.abs(seekerWidth - offset * 2);
-  const currentPosition = progress * totalWidth + offset
+  const currentPosition = progress * totalWidth + offset;
   const position = useRef({
     x: currentPosition,
     animated: new Animated.Value(currentPosition),
   }).current;
   const seekerRef = useRef<any>({}).current;
   useEffect(() => {
-    position.x = currentPosition;
-    position.animated.setValue(currentPosition);
+    if (!paused) {
+      position.x = currentPosition;
+      position.animated.setValue(currentPosition);
+    }
   }, [currentPosition]);
+  const bundleData = (totalWidth: number, x: number) => {
+    const interpolatedX = x - offset;
+    return {
+      x: interpolatedX,
+      width: totalWidth,
+      ratio: interpolatedX / totalWidth,
+    };
+  };
   seekerRef.onGrant = function (event: GestureResponderEvent) {
     const { locationX } = event.nativeEvent;
     setSeeking(true);
@@ -75,7 +87,13 @@ const Seeker = ({
   };
   seekerRef.onRelease = function (gestureState: PanResponderGestureState) {
     position.x = position.x + gestureState.dx;
-    onSeek?.({ eventName: 'RELEASE', ...bundleData(totalWidth, position.x) });
+    onSeek?.({
+      eventName: 'RELEASE',
+      ...bundleData(
+        totalWidth,
+        within(offset, position.x, seekerWidth - offset),
+      ),
+    });
     setSeeking(false);
   };
   const panResponder = useRef(

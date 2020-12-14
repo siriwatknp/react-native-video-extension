@@ -140,17 +140,13 @@ const VideoPlayer = ({
         <Seeker
           progress={duration ? currentTime / duration : 0}
           buffer={duration ? bufferTime / duration : 0}
+          paused={paused}
           onSeek={(data) => {
             console.log('data', data);
             if (data.eventName === 'GRANT') {
-              // videoInstance.current?.seek(duration * data.ratio)
-              setCurrentTime(duration * data.ratio)
               prevPaused.current = paused
               setPaused(true)
-            }
-            if (data.eventName === 'MOVE') {
               // videoInstance.current?.seek(duration * data.ratio)
-              // setCurrentTime(duration * data.ratio)
             }
             if (data.eventName === 'RELEASE') {
               videoInstance.current?.seek(duration * data.ratio)
