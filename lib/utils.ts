@@ -4,7 +4,7 @@ import { Inset } from './LayoutCalc';
 const HOUR = 60 * 60;
 const MINUTE = 60;
 export const GUTTER_PERCENT = 5;
-export const GUTTER_PX = 32;
+export const GUTTER_PX = 24;
 
 export const isZeroInsets = (insets: Partial<Inset>) =>
   Object.entries(insets).every(([, value]) => value === 0);

@@ -54,8 +54,7 @@ const App = () => {
               </View>
             </FullscreenHidden>
             <ScrollView
-              // scrollEnabled={!fullscreen && !seeking}
-              scrollEnabled={false}
+              scrollEnabled={!fullscreen && !seeking}
               style={styles.scrollView}
               contentContainerStyle={fullscreen && { width, height }}
             >

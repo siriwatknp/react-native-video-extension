@@ -7,6 +7,10 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
+import { getSeekDiff, getSeekerOffset } from '../LayoutCalc';
+import { useVideoCtx } from '../ScreenContainer';
+import useInsets from '../InsetInterface';
+import { useOpacity } from '../animation';
 
 export type SeekerProps = {
   filledColor?: string;
@@ -19,7 +23,7 @@ export type SeekerProps = {
     width: number;
     ratio: number;
   }) => void;
-  paused?: boolean;
+  bound?: boolean;
 };
 
 const within = (min: number, number: number, max: number) => {
@@ -39,8 +43,16 @@ const Seeker = ({
   progress = 0, // in ratio
   buffer = 0,
   onSeek,
-  paused,
-}: SeekerProps) => {
+  bound,
+  children,
+}: React.PropsWithChildren<SeekerProps>) => {
+  const insets = useInsets();
+  const {
+    fullscreen,
+    isLandscape: isLandscapeVideo,
+    consoleHidden,
+  } = useVideoCtx();
+  const barOpacity = useOpacity(consoleHidden && !!fullscreen);
   const [seeking, setSeeking] = useState(false);
   const [seekerWidth, setSeekerWidth] = useState(0);
   const offset = INITIAL_BUTTON_SIZE / 2;
@@ -51,8 +63,9 @@ const Seeker = ({
     animated: new Animated.Value(currentPosition),
   }).current;
   const seekerRef = useRef<any>({}).current;
+  const diff = getSeekDiff(!!fullscreen, isLandscapeVideo);
   useEffect(() => {
-    if (!paused) {
+    if (bound) {
       position.x = currentPosition;
       position.animated.setValue(currentPosition);
     }
@@ -79,14 +92,14 @@ const Seeker = ({
     event: GestureResponderEvent,
     gestureState: PanResponderGestureState,
   ) {
-    const result = position.x + gestureState.dx;
+    const result = position.x + gestureState[diff];
     if (result >= offset && result <= seekerWidth - offset) {
       position.animated.setValue(result);
       onSeek?.({ eventName: 'MOVE', ...bundleData(totalWidth, result) });
     }
   };
   seekerRef.onRelease = function (gestureState: PanResponderGestureState) {
-    position.x = position.x + gestureState.dx;
+    position.x = position.x + gestureState[diff];
     onSeek?.({
       eventName: 'RELEASE',
       ...bundleData(
@@ -112,10 +125,19 @@ const Seeker = ({
     }),
   ).current;
   return (
-    <View
+    <Animated.View
       testID="seeker_container"
       pointerEvents="box-only"
-      style={staticStyles.container}
+      style={{
+        ...staticStyles.container,
+        ...(fullscreen && { bottom: 0 }),
+        ...getSeekerOffset({
+          insets,
+          fullscreen: !!fullscreen,
+          isLandscape: isLandscapeVideo,
+        }),
+        opacity: barOpacity,
+      }}
       onLayout={(event) => {
         setSeekerWidth(event.nativeEvent.layout.width);
       }}
@@ -166,17 +188,20 @@ const Seeker = ({
           }}
         />
       </Animated.View>
-    </View>
+      {children}
+    </Animated.View>
   );
 };
 
 const staticStyles = StyleSheet.create({
   container: {
     position: 'absolute',
-    left: 32,
-    right: 32,
+    bottom: -THUMB_SIZE / 2 + BAR_HEIGHT / 2,
+    left: 0,
+    right: 0,
     justifyContent: 'center',
     height: THUMB_SIZE,
+    zIndex: 1001,
   },
   duration: {
     position: 'absolute',

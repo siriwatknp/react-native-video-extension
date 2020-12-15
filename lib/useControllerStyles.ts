@@ -1,9 +1,9 @@
 import { StyleSheet, useWindowDimensions } from 'react-native';
 import { useAnimatedFullscreen } from './animation';
 import { useVideoCtx } from './ScreenContainer';
-import {AspectRatio, GUTTER_PX} from './utils';
+import { AspectRatio } from './utils';
 import useInsets from './InsetInterface';
-import { getPlayerSize } from './LayoutCalc';
+import { getExitFullscreenOffset, getPlayerSize } from './LayoutCalc';
 
 const useControllerStyles = (
   aspectRatio: AspectRatio,
@@ -53,7 +53,7 @@ const useControllerStyles = (
     ]),
     fullscreenToggle: {
       ...styles.fullscreenToggle,
-      ...(fullscreen && { bottom: 56, right: GUTTER_PX / 2 }),
+      ...(fullscreen && getExitFullscreenOffset(isLandscape, insets)),
     },
     play: fullscreen ? styles.playFullscreen : styles.play,
   };
@@ -63,11 +63,11 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#000',
     zIndex: 1000,
-    overflow: 'visible'
+    overflow: 'visible',
   },
   initialContainer: {
     width: '100%',
-    overflow: 'visible'
+    overflow: 'visible',
   },
   fullscreenContainer: {
     position: 'absolute',

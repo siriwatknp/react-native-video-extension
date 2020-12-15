@@ -1,3 +1,4 @@
+import { Dimensions } from 'react-native';
 import {
   AspectRatio,
   calculateRotationDegree,
@@ -206,6 +207,74 @@ export const getPlayerTranslate2D = (
   }
   return [];
 };
+
+export const getSeekDiff = (fullscreen: boolean, isLandscapeVideo: boolean) => {
+  const { width, height } = Dimensions.get('window');
+  if (fullscreen) {
+    if (OrientationLocker.isPortraitLocked) {
+      return isLandscapeVideo ? 'dy' : 'dx';
+    }
+    if (width > height) {
+      // isLandscapeDevice
+      return isLandscapeVideo ? 'dx' : 'dy';
+    } else {
+      // isPortraitDevice
+      return isLandscapeVideo ? 'dy' : 'dx';
+    }
+  }
+  return 'dx';
+};
+
+export const getSeekerOffset = (info: Info) => {
+  const { insets, fullscreen, isLandscape } = info;
+  if (!fullscreen) {
+    return {};
+  }
+  if (!isLandscape) {
+    // for Portrait Video
+    if (!insets) {
+      return { left: GUTTER_PX, right: GUTTER_PX, bottom: 32 }; // no external useSafeAreaInsets
+    }
+    if ((insets && isZeroInsets(insets))) {
+      return { left: GUTTER_PX, right: GUTTER_PX, bottom: 20 }; // iPhone8
+    }
+    return { left: GUTTER_PX, right: GUTTER_PX, bottom: 0 }; // iPhone11+
+  }
+  // for Landscape Video
+  if (!insets) {
+    return { left: `${GUTTER_PERCENT}%`, right: `${GUTTER_PERCENT}%`, bottom: 20 };
+  }
+  if ((insets && isZeroInsets(insets))) {
+    return { left: GUTTER_PX, right: GUTTER_PX, bottom: 20 }; // iPhone8
+  }
+  return { bottom: 20 }; // iPhone11+
+};
+
+export const getExitFullscreenOffset = (isLandscape: boolean, insets?: Inset) => {
+  if (!isLandscape) {
+    if (insets && !isZeroInsets(insets)) {
+      return {
+        bottom: 48,
+        right: GUTTER_PX
+      }
+    }
+    return {
+      bottom: 72,
+      right: GUTTER_PX / 2
+    }
+  }
+  // for Landscape Video
+  if (insets) {
+    return {
+      bottom: 56,
+      right: GUTTER_PX / 2
+    }
+  }
+  return {
+    bottom: 56,
+    right: `${GUTTER_PERCENT}%`
+  }
+}
 
 export const getSeekerWidth = (
   windowSize: WindowDimension,

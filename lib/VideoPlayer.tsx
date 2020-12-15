@@ -1,9 +1,10 @@
-import React, { useRef, useState } from 'react';
+import React, { useReducer, useRef, useState } from 'react';
 import { Animated, View, ViewProps, TouchableOpacity } from 'react-native';
 import Video, { VideoProperties } from 'react-native-video';
 import { useVideoCtx } from './ScreenContainer';
 // import Seeker from './Seeker';
 import Seeker from './Seeker/Seeker';
+import Timer from './Timer';
 import Overlay from './Overlay';
 import useControllerStyles from './useControllerStyles';
 import usePaused from './usePause';
@@ -31,6 +32,15 @@ export interface VideoPlayerProps extends Omit<VideoProperties, 'paused'> {
 //    |  |- RNVideo
 //    |- BgOverlay
 
+type State = {
+  ended: boolean;
+  duration: number;
+  bufferTime: number;
+};
+interface Reducer {
+  (s: State, a: Partial<State>): State;
+}
+
 const VideoPlayer = ({
   initialPaused,
   initialAspectRatio = 'landscape',
@@ -39,12 +49,21 @@ const VideoPlayer = ({
   ...props
 }: VideoPlayerProps) => {
   let videoInstance = useRef<Video>();
-  const [ended, setEnded] = useState(false);
-  const [duration, setDuration] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [bufferTime, setBufferTime] = useState(0);
+  const [{ duration, bufferTime, ended }, setState] = useReducer<Reducer>(
+    (s, a) => ({ ...s, ...a }),
+    {
+      duration: 0,
+      bufferTime: 0,
+      ended: false,
+    },
+  );
   const paused = usePaused(initialPaused);
-  const prevPaused = useRef(paused);
+  const forceUpdate = useState({})[1];
+  const mutableState = useRef({
+    prevPaused: paused,
+    currentTime: 0,
+    lastAction: '', // todo: find a better way, workaround for pause and press forward/back
+  }).current;
   const {
     fullscreen,
     enterFullscreen,
@@ -52,7 +71,9 @@ const VideoPlayer = ({
     isLandscape,
     setIsLandscape,
     setPaused,
+    seeking,
     setSeeking,
+    consoleHidden,
   } = useVideoCtx();
   const styles = useControllerStyles(initialAspectRatio, isLandscape);
   return (
@@ -67,21 +88,15 @@ const VideoPlayer = ({
             }
           }}
           onEnd={() => {
-            setEnded(true);
+            setState({ ended: true });
           }}
           onLoad={(data) => {
-            setEnded(false);
-            setDuration(data.duration);
+            setState({ ended: false, duration: data.duration });
             setIsLandscape(data.naturalSize.orientation === 'landscape');
           }}
           onProgress={(data) => {
-            setEnded(false);
-            setCurrentTime(data.currentTime);
-            setBufferTime(data.playableDuration);
-          }}
-          onSeek={(data) => {
-            setCurrentTime(data.currentTime);
-            setSeeking(false);
+            setState({ ended: false, bufferTime: data.playableDuration });
+            mutableState.currentTime = data.currentTime;
           }}
           paused={paused}
           controls={false}
@@ -92,8 +107,12 @@ const VideoPlayer = ({
             <TouchableOpacity
               style={{ padding: 8 }}
               onPress={() => {
+                forceUpdate({});
+                mutableState.lastAction = 'BACK';
                 videoInstance.current?.seek(
-                  currentTime - 10 < 0 ? 0.1 : currentTime - 10,
+                  mutableState.currentTime - 10 < 0
+                    ? 0.1
+                    : mutableState.currentTime - 10,
                 );
               }}
             >
@@ -103,7 +122,8 @@ const VideoPlayer = ({
               <TouchableOpacity
                 onPress={() => {
                   videoInstance.current?.seek(0);
-                  setEnded(false);
+                  mutableState.lastAction = 'REFRESH';
+                  setState({ ended: false });
                 }}
                 style={styles.play}
               >
@@ -112,7 +132,12 @@ const VideoPlayer = ({
             ) : (
               <TouchableOpacity
                 style={styles.play}
-                onPress={() => setPaused((bool) => !bool)}
+                onPress={() =>
+                  setPaused((bool) => {
+                    mutableState.lastAction = bool ? 'PAUSE' : 'PLAY';
+                    return !bool;
+                  })
+                }
               >
                 {paused ? <SvgPlayArrow /> : <SvgPause />}
               </TouchableOpacity>
@@ -120,10 +145,12 @@ const VideoPlayer = ({
             <TouchableOpacity
               style={{ padding: 8 }}
               onPress={() => {
+                forceUpdate({});
+                mutableState.lastAction = 'FORWARD';
                 videoInstance.current?.seek(
-                  currentTime + 10 > duration
+                  mutableState.currentTime + 10 > duration
                     ? duration - 0.1
-                    : currentTime + 10,
+                    : mutableState.currentTime + 10,
                 );
               }}
             >
@@ -138,30 +165,36 @@ const VideoPlayer = ({
           </TouchableOpacity>
         </Overlay>
         <Seeker
-          progress={duration ? currentTime / duration : 0}
+          progress={duration ? mutableState.currentTime / duration : 0}
           buffer={duration ? bufferTime / duration : 0}
-          paused={paused}
+          bound={
+            (!paused && !seeking) ||
+            ['BACK', 'FORWARD'].includes(mutableState.lastAction)
+          }
           onSeek={(data) => {
-            console.log('data', data);
             if (data.eventName === 'GRANT') {
-              prevPaused.current = paused
-              setPaused(true)
-              // videoInstance.current?.seek(duration * data.ratio)
+              mutableState.prevPaused = paused;
+              setPaused(true);
+              setSeeking(true);
+            }
+            if (data.eventName === 'MOVE') {
+              mutableState.currentTime = duration * data.ratio;
+              mutableState.lastAction = 'MOVE'
+              forceUpdate({}); // to trigger timer update when dragging thumb
             }
             if (data.eventName === 'RELEASE') {
-              videoInstance.current?.seek(duration * data.ratio)
-              setPaused(prevPaused.current)
+              videoInstance.current?.seek(duration * data.ratio);
+              setPaused(mutableState.prevPaused);
+              setSeeking(false);
             }
           }}
-        />
-        {/*<Seeker*/}
-        {/*  videoInstance={videoInstance.current}*/}
-        {/*  duration={duration}*/}
-        {/*  currentTime={currentTime}*/}
-        {/*  bufferTime={bufferTime}*/}
-        {/*  isLandscapeVideo={isLandscape}*/}
-        {/*  vertical={fullscreen && isLandscape}*/}
-        {/*/>*/}
+        >
+          <Timer
+            currentTime={mutableState.currentTime}
+            duration={duration}
+            hidden={consoleHidden}
+          />
+        </Seeker>
       </Animated.View>
       <View style={styles.playerBg} />
     </View>
