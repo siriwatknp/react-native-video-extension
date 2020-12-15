@@ -10,12 +10,11 @@ import {
 import { getSeekDiff, getSeekerOffset } from '../LayoutCalc';
 import { useVideoCtx } from '../ScreenContainer';
 import useInsets from '../InsetInterface';
-import { useOpacity } from '../animation';
+import { useOpacity, useScaleSpring } from '../animation';
 
 export type SeekerProps = {
   filledColor?: string;
   buttonColor?: string;
-  progress?: number;
   buffer?: number;
   onSeek?: (data: {
     eventName: 'GRANT' | 'MOVE' | 'RELEASE';
@@ -23,7 +22,7 @@ export type SeekerProps = {
     width: number;
     ratio: number;
   }) => void;
-  bound?: boolean;
+  innerRef?: any;
 };
 
 const within = (min: number, number: number, max: number) => {
@@ -40,11 +39,10 @@ const TOUCHED_BUTTON_SIZE = 24;
 const Seeker = ({
   filledColor = DEFAULT_COLOR,
   buttonColor = DEFAULT_COLOR,
-  progress = 0, // in ratio
   buffer = 0,
   onSeek,
-  bound,
   children,
+  innerRef,
 }: React.PropsWithChildren<SeekerProps>) => {
   const insets = useInsets();
   const {
@@ -53,23 +51,24 @@ const Seeker = ({
     consoleHidden,
   } = useVideoCtx();
   const barOpacity = useOpacity(consoleHidden && !!fullscreen);
+  const scaleAnim = useScaleSpring(consoleHidden);
   const [seeking, setSeeking] = useState(false);
   const [seekerWidth, setSeekerWidth] = useState(0);
   const offset = INITIAL_BUTTON_SIZE / 2;
   const totalWidth = Math.abs(seekerWidth - offset * 2);
-  const currentPosition = progress * totalWidth + offset;
   const position = useRef({
-    x: currentPosition,
-    animated: new Animated.Value(currentPosition),
+    x: 0,
+    animated: new Animated.Value(0),
   }).current;
   const seekerRef = useRef<any>({}).current;
   const diff = getSeekDiff(!!fullscreen, isLandscapeVideo);
-  useEffect(() => {
-    if (bound) {
-      position.x = currentPosition;
-      position.animated.setValue(currentPosition);
-    }
-  }, [currentPosition]);
+  if (typeof innerRef === 'object') {
+    innerRef.seek = (ratio: number) => {
+      const nextPosition = ratio * totalWidth + offset;
+      position.x = nextPosition;
+      position.animated.setValue(nextPosition);
+    };
+  }
   const bundleData = (totalWidth: number, x: number) => {
     const interpolatedX = x - offset;
     return {
@@ -178,13 +177,14 @@ const Seeker = ({
           left: -THUMB_SIZE / 2,
         }}
       >
-        <View
+        <Animated.View
           testID="seeker_thumb_button"
           style={{
             ...staticStyles.thumbButton,
             backgroundColor: buttonColor,
             width: seeking ? TOUCHED_BUTTON_SIZE : INITIAL_BUTTON_SIZE,
             height: seeking ? TOUCHED_BUTTON_SIZE : INITIAL_BUTTON_SIZE,
+            transform: [{ scale: scaleAnim }],
           }}
         />
       </Animated.View>

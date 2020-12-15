@@ -111,6 +111,7 @@ export const getPlayerHeight = (
   const gap = Gap(info);
   const device = Device(windowSize);
   const { isLandscape, fullscreen, aspectRatio } = info;
+  const isLandscapeDevice = windowSize.width > windowSize.height;
   if (OrientationLocker.isPortraitLocked) {
     if (fullscreen) {
       return isLandscape ? device.width : device.height - gap.top - gap.bottom;
@@ -118,6 +119,9 @@ export const getPlayerHeight = (
     return device.width / getAspectRatio(aspectRatio);
   }
   if (fullscreen) {
+    if (isLandscapeDevice && !isLandscape) {
+      return device.height - gap.left - gap.right;
+    }
     return isLandscape ? device.width : device.height - gap.top - gap.bottom;
   }
   return windowSize.width / getAspectRatio(aspectRatio);
@@ -149,7 +153,7 @@ export const getPlayerMargin = (windowSize: WindowDimension, info: Info) => {
   if (fullscreen) {
     if (isLandscapeDevice) {
       return {
-        marginTop: !isLandscape ? (gap.top + gap.bottom) / 2 : 0,
+        marginTop: !isLandscape ? (gap.left + gap.right) / 2 : 0,
         marginLeft: isLandscape ? (gap.left + gap.right) / 2 : 0,
       };
     }

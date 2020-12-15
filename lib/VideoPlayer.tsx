@@ -49,6 +49,7 @@ const VideoPlayer = ({
   ...props
 }: VideoPlayerProps) => {
   let videoInstance = useRef<Video>();
+  const seekerRef = useRef<any>({}).current;
   const [{ duration, bufferTime, ended }, setState] = useReducer<Reducer>(
     (s, a) => ({ ...s, ...a }),
     {
@@ -62,7 +63,6 @@ const VideoPlayer = ({
   const mutableState = useRef({
     prevPaused: paused,
     currentTime: 0,
-    lastAction: '', // todo: find a better way, workaround for pause and press forward/back
   }).current;
   const {
     fullscreen,
@@ -71,7 +71,6 @@ const VideoPlayer = ({
     isLandscape,
     setIsLandscape,
     setPaused,
-    seeking,
     setSeeking,
     consoleHidden,
   } = useVideoCtx();
@@ -97,6 +96,7 @@ const VideoPlayer = ({
           onProgress={(data) => {
             setState({ ended: false, bufferTime: data.playableDuration });
             mutableState.currentTime = data.currentTime;
+            seekerRef.seek?.(data.currentTime / duration)
           }}
           paused={paused}
           controls={false}
@@ -108,12 +108,12 @@ const VideoPlayer = ({
               style={{ padding: 8 }}
               onPress={() => {
                 forceUpdate({});
-                mutableState.lastAction = 'BACK';
-                videoInstance.current?.seek(
+                const seconds =
                   mutableState.currentTime - 10 < 0
                     ? 0.1
-                    : mutableState.currentTime - 10,
-                );
+                    : mutableState.currentTime - 10;
+                videoInstance.current?.seek(seconds);
+                seekerRef.seek?.(seconds / duration)
               }}
             >
               <SvgReplay10 />
@@ -122,7 +122,6 @@ const VideoPlayer = ({
               <TouchableOpacity
                 onPress={() => {
                   videoInstance.current?.seek(0);
-                  mutableState.lastAction = 'REFRESH';
                   setState({ ended: false });
                 }}
                 style={styles.play}
@@ -132,12 +131,7 @@ const VideoPlayer = ({
             ) : (
               <TouchableOpacity
                 style={styles.play}
-                onPress={() =>
-                  setPaused((bool) => {
-                    mutableState.lastAction = bool ? 'PAUSE' : 'PLAY';
-                    return !bool;
-                  })
-                }
+                onPress={() => setPaused((bool) => !bool)}
               >
                 {paused ? <SvgPlayArrow /> : <SvgPause />}
               </TouchableOpacity>
@@ -146,12 +140,12 @@ const VideoPlayer = ({
               style={{ padding: 8 }}
               onPress={() => {
                 forceUpdate({});
-                mutableState.lastAction = 'FORWARD';
-                videoInstance.current?.seek(
+                const seconds =
                   mutableState.currentTime + 10 > duration
                     ? duration - 0.1
-                    : mutableState.currentTime + 10,
-                );
+                    : mutableState.currentTime + 10;
+                videoInstance.current?.seek(seconds);
+                seekerRef.seek?.(seconds / duration)
               }}
             >
               <SvgForward10 />
@@ -165,12 +159,8 @@ const VideoPlayer = ({
           </TouchableOpacity>
         </Overlay>
         <Seeker
-          progress={duration ? mutableState.currentTime / duration : 0}
+          innerRef={seekerRef}
           buffer={duration ? bufferTime / duration : 0}
-          bound={
-            (!paused && !seeking) ||
-            ['BACK', 'FORWARD'].includes(mutableState.lastAction)
-          }
           onSeek={(data) => {
             if (data.eventName === 'GRANT') {
               mutableState.prevPaused = paused;
@@ -179,7 +169,6 @@ const VideoPlayer = ({
             }
             if (data.eventName === 'MOVE') {
               mutableState.currentTime = duration * data.ratio;
-              mutableState.lastAction = 'MOVE'
               forceUpdate({}); // to trigger timer update when dragging thumb
             }
             if (data.eventName === 'RELEASE') {
