@@ -231,27 +231,28 @@ export const getSeekDiff = (fullscreen: boolean, isLandscapeVideo: boolean) => {
 
 export const getSeekerOffset = (info: Info) => {
   const { insets, fullscreen, isLandscape } = info;
+  const normalGutter = { left: GUTTER_PX, right: GUTTER_PX }
   if (!fullscreen) {
     return {};
   }
   if (!isLandscape) {
     // for Portrait Video
     if (!insets) {
-      return { left: GUTTER_PX, right: GUTTER_PX, bottom: 32 }; // no external useSafeAreaInsets
+      return { ...normalGutter, bottom: 32 }; // no external useSafeAreaInsets
     }
     if ((insets && isZeroInsets(insets))) {
-      return { left: GUTTER_PX, right: GUTTER_PX, bottom: 20 }; // iPhone8
+      return { ...normalGutter, bottom: 20 }; // iPhone8
     }
-    return { left: GUTTER_PX, right: GUTTER_PX, bottom: 0 }; // iPhone11+
+    return { ...normalGutter, bottom: 0 }; // iPhone11+
   }
   // for Landscape Video
   if (!insets) {
     return { left: `${GUTTER_PERCENT}%`, right: `${GUTTER_PERCENT}%`, bottom: 20 };
   }
   if ((insets && isZeroInsets(insets))) {
-    return { left: GUTTER_PX, right: GUTTER_PX, bottom: 20 }; // iPhone8
+    return { ...normalGutter, bottom: 20 }; // iPhone8
   }
-  return { bottom: 20 }; // iPhone11+
+  return { ...normalGutter, bottom: 20 }; // iPhone11+
 };
 
 export const getExitFullscreenOffset = (isLandscape: boolean, insets?: Inset) => {

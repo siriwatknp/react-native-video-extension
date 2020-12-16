@@ -55,7 +55,11 @@ const useControllerStyles = (
       ...styles.fullscreenToggle,
       ...(fullscreen && getExitFullscreenOffset(isLandscape, insets)),
     },
-    play: fullscreen ? styles.playFullscreen : styles.play,
+    play: fullscreen
+      ? isLandscape
+        ? styles.playFullscreenLandscape
+        : styles.playFullscreenPortrait
+      : styles.play,
   };
 };
 
@@ -106,8 +110,11 @@ const styles = StyleSheet.create({
   play: {
     marginHorizontal: 48,
   },
-  playFullscreen: {
+  playFullscreenPortrait: {
     marginHorizontal: '12%',
+  },
+  playFullscreenLandscape: {
+    marginHorizontal: '24%',
   },
 });
 
