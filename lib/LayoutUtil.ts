@@ -1,3 +1,6 @@
+import { Dimensions, ViewStyle } from 'react-native';
+import { OrientationValue } from './OrientationInterface';
+
 type Data = {
   deviceWidth: number;
   deviceHeight: number;
@@ -6,7 +9,20 @@ type Data = {
   insets: Partial<{ top: number; bottom: number; left: number; right: number }>;
 };
 
-export const getCanvasAutoFitSize = (data: Data) => {
+type LayoutData = {
+  isPortraitLocked: boolean;
+  isLandscapeDevice: boolean;
+  isLandscapeVideo: boolean;
+  insets?: Partial<{
+    top: number;
+    bottom: number;
+    left: number;
+    right: number;
+  }>;
+  deviceOrientation?: OrientationValue;
+};
+
+export const getCanvasContainSize = (data: Data) => {
   const {
     deviceWidth,
     deviceHeight,
@@ -45,7 +61,7 @@ export const getCanvasAutoFitSize = (data: Data) => {
   return { width: 0, height: 0 };
 };
 
-export const getCanvasContainSize = (
+export const getCanvasAutoFitSize = (
   data: Data & { isLandscapeVideo: boolean },
 ) => {
   const {
@@ -89,6 +105,7 @@ export const getCanvasContainSize = (
       };
     }
     if (isLandscapeDevice && !isLandscapeVideo) {
+      console.log('test');
       return {
         width: deviceWidth,
         height: deviceHeight - (insets?.left ?? 0) - (insets?.right ?? 0),
@@ -98,9 +115,9 @@ export const getCanvasContainSize = (
   return { width: 0, height: 0 };
 };
 
-export const getCanvasAutoFitRotation = (data: {
+export const getCanvasContainRotation = (data: {
   isPortraitLocked: boolean;
-  deviceOrientation?: 'PORTRAIT' | 'LANDSCAPE-LEFT' | 'LANDSCAPE-RIGHT';
+  deviceOrientation?: OrientationValue;
 }) => {
   const { deviceOrientation, isPortraitLocked } = data;
   if (isPortraitLocked) {
@@ -114,43 +131,91 @@ export const getCanvasAutoFitRotation = (data: {
   return 0;
 };
 
-export const getCanvasContainRotation = (data: {
+export const getCanvasAutoFitRotation = (data: {
   isPortraitLocked: boolean;
   isLandscapeDevice: boolean;
   isLandscapeVideo: boolean;
-  deviceOrientation?: 'PORTRAIT' | 'LANDSCAPE-LEFT' | 'LANDSCAPE-RIGHT';
+  deviceOrientation?: OrientationValue;
 }) => {
-  const { deviceOrientation, isPortraitLocked, isLandscapeVideo, isLandscapeDevice } = data;
+  const {
+    deviceOrientation,
+    isPortraitLocked,
+    isLandscapeVideo,
+    isLandscapeDevice,
+  } = data;
   if (isPortraitLocked) {
     if (isLandscapeVideo) {
       if (deviceOrientation === 'LANDSCAPE-RIGHT') {
-        return -90
+        return -90;
       }
-      return 90
+      return 90;
     }
   }
   if (!isPortraitLocked) {
     if (!isLandscapeDevice && isLandscapeVideo) {
-      return 90
+      return 90;
     }
     if (isLandscapeDevice && !isLandscapeVideo) {
-      return -90
+      return -90;
     }
   }
   return 0;
 };
 
-// export const getCanvasLayout = (data: Data) => {
-//   const {width, height} = getCanvasAutoFitSize();
-//   return {
-//     width: width,
-//     height: height,
-//     top: '50%',
-//     left: '50%',
-//     transform: [
-//       { translateX: -width / 2 },
-//       { translateY: -height / 2 },
-//       { rotate: 0 },
-//     ],
-//   };
-// };
+export const Device = (isPortraitLocked: boolean) => {
+  const windowSize = Dimensions.get('window');
+  return [
+    !isPortraitLocked && windowSize.width > windowSize.height
+      ? windowSize.height
+      : windowSize.width,
+    !isPortraitLocked && windowSize.width > windowSize.height
+      ? windowSize.width
+      : windowSize.height,
+  ];
+};
+
+export const getAutoFitCanvasLayout = (data: LayoutData) => {
+  const [deviceWidth, deviceHeight] = Device(data.isPortraitLocked);
+  const { width, height } = getCanvasAutoFitSize({
+    ...data,
+    insets: data.insets ?? {},
+    deviceWidth,
+    deviceHeight,
+  });
+  return {
+    position: 'absolute',
+    zIndex: 1200,
+    width,
+    height,
+    top: '50%',
+    left: '50%',
+    transform: [
+      { translateX: -width / 2 },
+      { translateY: -height / 2 },
+      { rotate: `${getCanvasAutoFitRotation(data)}deg` },
+    ],
+  } as ViewStyle;
+};
+
+export const getContainCanvasLayout = (data: LayoutData) => {
+  const [deviceWidth, deviceHeight] = Device(data.isPortraitLocked);
+  const { width, height } = getCanvasContainSize({
+    ...data,
+    insets: data.insets ?? {},
+    deviceWidth,
+    deviceHeight,
+  });
+  return {
+    position: 'absolute',
+    zIndex: 1200,
+    width,
+    height,
+    top: '50%',
+    left: '50%',
+    transform: [
+      { translateX: -width / 2 },
+      { translateY: -height / 2 },
+      { rotate: `${getCanvasContainRotation(data)}deg` },
+    ],
+  } as ViewStyle;
+};

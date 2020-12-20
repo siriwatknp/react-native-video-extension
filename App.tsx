@@ -17,6 +17,7 @@ import Home from './src/Home';
 import Player from './src/Player';
 import Layout from './src/Layout';
 import Lock from './src/Lock';
+import Canvas from './src/Canvas';
 
 declare const global: { HermesInternal: null | {} };
 
@@ -27,6 +28,7 @@ export type RootStackParamList = {
   Player: undefined;
   Layout: undefined;
   Lock: undefined;
+  Canvas: undefined;
 };
 
 const App = () => {
@@ -38,6 +40,7 @@ const App = () => {
           <Stack.Screen name="Player" component={Player} />
           <Stack.Screen name="Layout" component={Layout} />
           <Stack.Screen name="Lock" component={Lock} />
+          <Stack.Screen name="Canvas" component={Canvas} />
         </Stack.Navigator>
       </NavigationContainer>
       {global.HermesInternal == null ? null : (

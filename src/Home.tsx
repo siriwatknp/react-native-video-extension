@@ -26,6 +26,11 @@ const Home = ({ navigation }: HomeProps) => (
       title="Lock"
       onPress={() => navigation.navigate("Lock")}
     />
+    <View style={{ height: 24 }} />
+    <Button
+      title="Canvas"
+      onPress={() => navigation.navigate("Canvas")}
+    />
   </View>
 );
 

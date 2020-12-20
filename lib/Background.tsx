@@ -29,6 +29,7 @@ const Background = ({
   return (
     <Animated.View
       style={StyleSheet.flatten([
+        { backgroundColor: '#000' },
         style,
         {
           width,
@@ -37,7 +38,6 @@ const Background = ({
           position: 'absolute',
           top: '50%',
           left: '50%',
-          backgroundColor: '#000',
           transform: [
             { translateX: -width / 2 },
             { translateY: -height / 2 },

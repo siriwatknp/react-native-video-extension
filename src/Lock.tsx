@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, TouchableOpacity, Button, Text } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Orientation from 'react-native-orientation-locker';
 import Background from '../lib/Background';
 
+import { getAutoFitCanvasLayout } from '../lib/LayoutUtil';
 import { RootStackParamList } from '../App';
 
 type LockNavigationProp = StackNavigationProp<RootStackParamList, 'Lock'>;
@@ -14,6 +16,7 @@ export type LockProps = {
 
 const Lock = ({ navigation }: LockProps) => {
   const isPortraitLocked = true;
+  const insets = useSafeAreaInsets();
   const [fullscreen, setFullscreen] = useState(false);
   // useEffect(() => {
   //   const handleOrientation = (type: any) => {
@@ -25,6 +28,10 @@ const Lock = ({ navigation }: LockProps) => {
   //   };
   // }, [])
   useEffect(() => {
+    console.log('test');
+    navigation.setOptions({
+      headerShown: false,
+    });
     if (isPortraitLocked) {
       Orientation.lockToPortrait();
     } else {
@@ -44,19 +51,19 @@ const Lock = ({ navigation }: LockProps) => {
       </Background>
       <View
         style={{
-          position: 'absolute',
           backgroundColor: 'rgba(0,0,0,0.38)',
-          width: 500,
-          height: 100,
-          top: '50%',
-          left: '50%',
-          transform: [
-            { translateX: -250 },
-            { translateY: -50 },
-            { rotate: '10deg' },
-          ],
+          justifyContent: 'center',
+          alignItems: 'center',
+          ...getAutoFitCanvasLayout({
+            isPortraitLocked: false,
+            isLandscapeVideo: false,
+            isLandscapeDevice: false,
+            insets,
+          }),
         }}
-      />
+      >
+        <Text style={{ color: '#fff' }}>Hello Test</Text>
+      </View>
     </View>
   );
 };
