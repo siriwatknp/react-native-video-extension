@@ -4,6 +4,13 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Orientation, { OrientationType } from 'react-native-orientation-locker';
 import Background from '../lib/Background';
+import Toolbar from '../lib/Toolbar';
+import {
+  SvgFullscreen,
+  SvgPlayArrow,
+  SvgReplay10,
+  SvgForward10,
+} from './icons';
 
 import {
   getAutoFitCanvasLayout,
@@ -48,7 +55,7 @@ const Canvas = ({ navigation }: CanvasProps) => {
     isLandscapeVideo: false,
     isLandscapeDevice: false,
     deviceOrientation: 'UNKNOWN',
-    hasInsets: false,
+    hasInsets: true,
     mode: '',
   });
   useEffect(() => {
@@ -151,12 +158,34 @@ const Canvas = ({ navigation }: CanvasProps) => {
                 alignItems: 'center',
                 ...fullscreenStyle,
               }
-            : { height: 0, width: 0 }
+            : { height: 0, width: 0, overflow: 'hidden' }
         }
       >
-        <TouchableOpacity onPress={() => setState({ fullscreen: false })}>
+        <TouchableOpacity
+          style={{ padding: 16 }}
+          onPress={() => setState({ fullscreen: false })}
+        >
           <Text style={{ color: '#fff' }}>Exit Fullscreen</Text>
         </TouchableOpacity>
+        <Toolbar position={'bottom'} justify={'flex-end'}>
+          <SvgFullscreen />
+        </Toolbar>
+        <Toolbar
+          position={'center'}
+          style={{ transform: [{ translateY: -64 }] }}
+        >
+          <SvgReplay10 />
+          <View style={{ marginLeft: 24, marginRight: 24 }}>
+            <SvgPlayArrow />
+          </View>
+          <SvgForward10 />
+        </Toolbar>
+        <Toolbar position={'top'}>
+          <Text style={{ color: '#fff', fontSize: 16, lineHeight: 24 }}>
+            Avengers Assemble - Portals Scene | Avengers: Endgame (2019) Movie
+            Clip
+          </Text>
+        </Toolbar>
       </View>
     </View>
   );
