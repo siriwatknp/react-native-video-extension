@@ -1,6 +1,7 @@
-import { useEffect } from 'react';
-import { VideoContext } from './ScreenContainer';
+import { useEffect, useState } from 'react';
+import { FullscreenOrientation, VideoContext } from './ScreenContainer';
 import { OrientationLocker } from './LayoutCalc';
+import { useWindowDimensions } from 'react-native';
 
 export type OrientationValue =
   | 'PORTRAIT'
@@ -15,6 +16,7 @@ interface Callback {
 }
 interface OrientationLib {
   lockToPortrait: () => void;
+  getDeviceOrientation: (callback: Callback) => void;
   addDeviceOrientationListener: (callback: Callback) => void;
   removeDeviceOrientationListener: (callback: Callback) => void;
   unlockAllOrientations: () => void;
@@ -22,6 +24,9 @@ interface OrientationLib {
 
 let OrientationAPI = {
   lockToPortrait: () => {},
+  getDeviceOrientation: (callback: Callback) => {
+    callback('UNKNOWN');
+  },
   addDeviceOrientationListener: (callback: Callback) => {
     callback('UNKNOWN');
   },
@@ -45,6 +50,11 @@ const useOrientationEffect = ({
   setFullscreen: VideoContext['setFullscreen'];
   isLandscape: boolean;
 }) => {
+  const { width, height } = useWindowDimensions();
+  const [
+    fullscreenOrientation,
+    setOrientation,
+  ] = useState<FullscreenOrientation>('PORTRAIT');
   let Orientation = OrientationAPI;
   useEffect(() => {
     Orientation.lockToPortrait();
@@ -58,6 +68,7 @@ const useOrientationEffect = ({
         orientation === 'LANDSCAPE-LEFT' ||
         orientation === 'LANDSCAPE-RIGHT'
       ) {
+        setOrientation(orientation);
         setFullscreen(orientation);
       } else {
         if (
@@ -72,6 +83,7 @@ const useOrientationEffect = ({
         } else if (orientation !== 'UNKNOWN') {
           setFullscreen(false);
         }
+        setOrientation('PORTRAIT');
       }
     }
     Orientation.addDeviceOrientationListener(handleOrientation);
@@ -79,6 +91,11 @@ const useOrientationEffect = ({
       Orientation.removeDeviceOrientationListener(handleOrientation);
     };
   }, [Orientation, isLandscape, fullscreen]);
+  return !OrientationLocker.isPortraitLocked
+    ? width > height
+      ? 'LANDSCAPE-LEFT'
+      : 'PORTRAIT'
+    : fullscreenOrientation;
 };
 
 export default useOrientationEffect;

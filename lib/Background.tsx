@@ -20,11 +20,16 @@ const Background = ({
   const { width, height } = useWindowDimensions();
   const scale = useRef(new Animated.Value(fullscreen ? 1 : 0)).current;
   useEffect(() => {
-    Animated.spring(scale, {
-      toValue: fullscreen ? 1.2 : 0,
+    // Animated.spring(scale, {
+    //   toValue: fullscreen ? 1.2 : 0,
+    //   useNativeDriver: true,
+    //   friction: 8,
+    // }).start();
+    Animated.timing(scale, {
+      toValue: fullscreen ? 1 : 0,
       useNativeDriver: true,
-      friction: 8,
-    }).start();
+      duration: 0,
+    }).start()
   }, [fullscreen, scale]);
   return (
     <Animated.View

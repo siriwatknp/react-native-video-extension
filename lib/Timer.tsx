@@ -1,24 +1,30 @@
 import React from 'react';
-import { Animated, StyleSheet, Text } from 'react-native';
+import { Animated, StyleSheet, Text, ViewProps } from 'react-native';
 import { toTimeView } from './utils';
 import { useOpacity } from './animation';
-import {useVideoCtx} from "./ScreenContainer";
 
 export type TimerProps = {
   currentTime: number;
   duration: number;
   hidden: boolean;
-};
+} & ViewProps;
 
-const Timer = ({ currentTime, duration, hidden }: TimerProps) => {
-  const { fullscreen } = useVideoCtx();
+const Timer = ({
+  currentTime,
+  duration,
+  hidden,
+  style,
+  ...props
+}: TimerProps) => {
   const timeOpacity = useOpacity(hidden);
   return (
     <Animated.View
       style={StyleSheet.flatten([
         styles.seekbarTime,
-        { opacity: timeOpacity, marginLeft: fullscreen ? 0 : 16 },
+        style,
+        { opacity: timeOpacity },
       ])}
+      {...props}
     >
       <Text style={styles.time}>{toTimeView(currentTime)}</Text>
       <Text

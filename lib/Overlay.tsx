@@ -18,20 +18,14 @@ const Overlay = ({ children }: React.PropsWithChildren<OverlayProps>) => {
       );
     }
     return () => clearTimeout(id);
-  }, [consoleHidden, paused, forced]);
+  }, [consoleHidden, paused]);
   return (
     <Animated.View
-      onStartShouldSetResponderCapture={() => {
-        forceUpdate({}); // call this fn to delay consoleHidden for another 2 sec
-        return false;
-      }}
       onStartShouldSetResponder={(event) => {
-        return event.nativeEvent.touches.length === 1;
+        return event.nativeEvent.touches.length <= 1;
       }}
-      onResponderRelease={(event) => {
-        if (event.target == event.currentTarget) {
-          setConsoleHidden((bool) => !bool);
-        }
+      onResponderRelease={() => {
+        setConsoleHidden((bool) => !bool);
       }}
       pointerEvents={consoleHidden ? 'box-only' : 'auto'}
       style={StyleSheet.flatten([styles.overlay, { opacity: opacityAnim }])}

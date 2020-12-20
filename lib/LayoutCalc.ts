@@ -7,7 +7,7 @@ import {
   GUTTER_PX,
   isZeroInsets,
 } from './utils';
-import { VideoContext } from './ScreenContainer';
+import {FullscreenOrientation, VideoContext} from './ScreenContainer';
 
 interface WindowDimension {
   width: number;
@@ -212,7 +212,10 @@ export const getPlayerTranslate2D = (
   return [];
 };
 
-export const getSeekDiff = (fullscreen: boolean, isLandscapeVideo: boolean) => {
+export const getAutoFitSeekDiff = (
+  fullscreen: boolean,
+  isLandscapeVideo: boolean,
+) => {
   const { width, height } = Dimensions.get('window');
   if (fullscreen) {
     if (OrientationLocker.isPortraitLocked) {
@@ -229,9 +232,23 @@ export const getSeekDiff = (fullscreen: boolean, isLandscapeVideo: boolean) => {
   return 'dx';
 };
 
+export const getContainSeekDiff = (fullscreen: VideoContext['fullscreen']) => {
+  const { width, height } = Dimensions.get('window');
+  if (fullscreen) {
+    if (OrientationLocker.isPortraitLocked) {
+      return fullscreen === 'PORTRAIT' ? 'dx' : 'dy';
+    }
+    if (width > height) {
+      // isLandscapeDevice
+      return 'dy';
+    }
+  }
+  return 'dx';
+};
+
 export const getSeekerOffset = (info: Info) => {
   const { insets, fullscreen, isLandscape } = info;
-  const normalGutter = { left: GUTTER_PX, right: GUTTER_PX }
+  const normalGutter = { left: GUTTER_PX, right: GUTTER_PX };
   if (!fullscreen) {
     return {};
   }
@@ -240,46 +257,53 @@ export const getSeekerOffset = (info: Info) => {
     if (!insets) {
       return { ...normalGutter, bottom: 32 }; // no external useSafeAreaInsets
     }
-    if ((insets && isZeroInsets(insets))) {
+    if (insets && isZeroInsets(insets)) {
       return { ...normalGutter, bottom: 20 }; // iPhone8
     }
     return { ...normalGutter, bottom: 0 }; // iPhone11+
   }
   // for Landscape Video
   if (!insets) {
-    return { left: `${GUTTER_PERCENT}%`, right: `${GUTTER_PERCENT}%`, bottom: 20 };
+    return {
+      left: `${GUTTER_PERCENT}%`,
+      right: `${GUTTER_PERCENT}%`,
+      bottom: 20,
+    };
   }
-  if ((insets && isZeroInsets(insets))) {
+  if (insets && isZeroInsets(insets)) {
     return { ...normalGutter, bottom: 20 }; // iPhone8
   }
   return { ...normalGutter, bottom: 20 }; // iPhone11+
 };
 
-export const getExitFullscreenOffset = (isLandscape: boolean, insets?: Inset) => {
+export const getExitFullscreenOffset = (
+  isLandscape: boolean,
+  insets?: Inset,
+) => {
   if (!isLandscape) {
     if (insets && !isZeroInsets(insets)) {
       return {
         bottom: 48,
-        right: GUTTER_PX
-      }
+        right: GUTTER_PX,
+      };
     }
     return {
       bottom: 72,
-      right: GUTTER_PX / 2
-    }
+      right: GUTTER_PX / 2,
+    };
   }
   // for Landscape Video
   if (insets) {
     return {
       bottom: 56,
-      right: GUTTER_PX / 2
-    }
+      right: GUTTER_PX / 2,
+    };
   }
   return {
     bottom: 56,
-    right: `${GUTTER_PERCENT}%`
-  }
-}
+    right: `${GUTTER_PERCENT}%`,
+  };
+};
 
 export const getSeekerWidth = (
   windowSize: WindowDimension,

@@ -2,7 +2,6 @@ import React, { useReducer, useRef, useState } from 'react';
 import { Animated, View, ViewProps, TouchableOpacity } from 'react-native';
 import Video, { VideoProperties } from 'react-native-video';
 import { useVideoCtx } from './ScreenContainer';
-// import Seeker from './Seeker';
 import Seeker from './Seeker/Seeker';
 import Timer from './Timer';
 import Overlay from './Overlay';

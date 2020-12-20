@@ -9,7 +9,7 @@ type Data = {
   insets: Partial<{ top: number; bottom: number; left: number; right: number }>;
 };
 
-type LayoutData = {
+export type LayoutData = {
   isPortraitLocked: boolean;
   isLandscapeDevice: boolean;
   isLandscapeVideo: boolean;

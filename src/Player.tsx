@@ -30,7 +30,7 @@ export type PlayerProps = {
   navigation: PlayerNavigationProp;
 };
 
-connectUseInsets(useSafeAreaInsets);
+// connectUseInsets(useSafeAreaInsets);
 // connectOrientationLib(Orientation);
 Orientation.unlockAllOrientations();
 
@@ -54,7 +54,7 @@ const Player = ({ route, navigation }: PlayerProps) => {
       <StatusBar barStyle="dark-content" />
       <FullscreenHidden>
         <View>
-          <Text style={{ fontSize: 24, padding: 16 }}>Fixed Title</Text>
+          <Text style={{ fontSize: 24, padding: 16 }}>Fixed Title!</Text>
         </View>
       </FullscreenHidden>
       <ScrollView

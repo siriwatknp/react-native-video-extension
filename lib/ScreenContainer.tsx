@@ -1,8 +1,11 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import useOrientationEffect from './OrientationInterface';
-import {StatusBar} from "react-native";
+import { StatusBar } from 'react-native';
 
-export type FullscreenOrientation = 'LANDSCAPE-LEFT' | 'LANDSCAPE-RIGHT';
+export type FullscreenOrientation =
+  | 'LANDSCAPE-LEFT'
+  | 'LANDSCAPE-RIGHT'
+  | 'PORTRAIT';
 
 export interface VideoContext {
   fullscreen: FullscreenOrientation | false;
@@ -51,10 +54,7 @@ const isValidConsumer = (
   return typeof children === 'function';
 };
 
-const ScreenContainer = ({
-  children,
-  config = {},
-}: ScreenContainerProps) => {
+const ScreenContainer = ({ children, config = {} }: ScreenContainerProps) => {
   const [fullscreen, setFullscreen] = useState<VideoContext['fullscreen']>(
     false,
   );
@@ -62,20 +62,24 @@ const ScreenContainer = ({
   const [paused, setPaused] = useState(false);
   const [consoleHidden, setConsoleHidden] = useState(true);
   const [isLandscape, setIsLandscape] = useState(true);
-  useOrientationEffect({ fullscreen, setFullscreen, isLandscape });
+  const fullscreenOrientation = useOrientationEffect({
+    fullscreen,
+    setFullscreen,
+    isLandscape,
+  });
   useEffect(() => {
     if (fullscreen) {
-      StatusBar.setHidden(true)
+      StatusBar.setHidden(true);
     } else {
-      StatusBar.setHidden(false)
+      StatusBar.setHidden(false);
     }
-  }, [fullscreen])
+  }, [fullscreen]);
   return (
     <ctx.Provider
       value={{
         fullscreen,
         setFullscreen,
-        enterFullscreen: () => setFullscreen('LANDSCAPE-LEFT'),
+        enterFullscreen: () => setFullscreen(fullscreenOrientation),
         exitFullscreen: () => setFullscreen(false),
         isLandscape,
         setIsLandscape,

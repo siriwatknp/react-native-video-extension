@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   Animated,
   GestureResponderEvent,
@@ -6,23 +6,26 @@ import {
   PanResponderGestureState,
   StyleSheet,
   View,
+  ViewStyle,
 } from 'react-native';
-import { getSeekDiff, getSeekerOffset } from '../LayoutCalc';
+import { getAutoFitSeekDiff, getContainSeekDiff } from '../LayoutCalc';
 import { useVideoCtx } from '../ScreenContainer';
-import useInsets from '../InsetInterface';
 import { useOpacity, useScaleSpring } from '../animation';
 
+export type SeekerEventData = {
+  eventName: 'GRANT' | 'MOVE' | 'RELEASE';
+  x: number;
+  width: number;
+  ratio: number;
+};
 export type SeekerProps = {
+  mode: 'auto-fit' | 'contain';
   filledColor?: string;
   buttonColor?: string;
   buffer?: number;
-  onSeek?: (data: {
-    eventName: 'GRANT' | 'MOVE' | 'RELEASE';
-    x: number;
-    width: number;
-    ratio: number;
-  }) => void;
+  onSeek?: (data: SeekerEventData) => void;
   innerRef?: any;
+  style?: ViewStyle;
 };
 
 const within = (min: number, number: number, max: number) => {
@@ -36,15 +39,19 @@ const THUMB_SIZE = 40;
 const BAR_HEIGHT = 2;
 const INITIAL_BUTTON_SIZE = 16;
 const TOUCHED_BUTTON_SIZE = 24;
+
+export const SNAP_BOTTOM = -THUMB_SIZE / 2 + BAR_HEIGHT / 2;
+
 const Seeker = ({
+  mode,
   filledColor = DEFAULT_COLOR,
   buttonColor = DEFAULT_COLOR,
   buffer = 0,
   onSeek,
   children,
   innerRef,
+  style,
 }: React.PropsWithChildren<SeekerProps>) => {
-  const insets = useInsets();
   const {
     fullscreen,
     isLandscape: isLandscapeVideo,
@@ -61,7 +68,11 @@ const Seeker = ({
     animated: new Animated.Value(0),
   }).current;
   const seekerRef = useRef<any>({}).current;
-  const diff = getSeekDiff(!!fullscreen, isLandscapeVideo);
+  const getDiff = {
+    'auto-fit': getAutoFitSeekDiff(!!fullscreen, isLandscapeVideo),
+    contain: getContainSeekDiff(fullscreen),
+  } as const;
+  const diff = getDiff[mode];
   if (typeof innerRef === 'object') {
     innerRef.seek = (ratio: number) => {
       const nextPosition = ratio * totalWidth + offset;
@@ -69,6 +80,10 @@ const Seeker = ({
       position.animated.setValue(nextPosition);
     };
   }
+  useEffect(() => {
+    // todo: update position when seekerWidth changes
+    console.log('position.x', position.x);
+  }, [seekerWidth])
   const bundleData = (totalWidth: number, x: number) => {
     const interpolatedX = x - offset;
     return {
@@ -129,15 +144,11 @@ const Seeker = ({
       pointerEvents="box-only"
       style={{
         ...staticStyles.container,
-        ...(fullscreen && { bottom: 0 }),
-        ...getSeekerOffset({
-          insets,
-          fullscreen: !!fullscreen,
-          isLandscape: isLandscapeVideo,
-        }),
+        ...style,
         opacity: barOpacity,
       }}
       onLayout={(event) => {
+        console.log('event.nativeEvent.layout.width', event.nativeEvent.layout.width);
         setSeekerWidth(event.nativeEvent.layout.width);
       }}
       {...panResponder.panHandlers}
@@ -195,8 +206,6 @@ const Seeker = ({
 
 const staticStyles = StyleSheet.create({
   container: {
-    position: 'absolute',
-    bottom: -THUMB_SIZE / 2 + BAR_HEIGHT / 2,
     left: 0,
     right: 0,
     justifyContent: 'center',
@@ -210,7 +219,6 @@ const staticStyles = StyleSheet.create({
   },
   buffer: {
     position: 'absolute',
-    width: '70%',
     backgroundColor: 'rgba(255,255,255,0.38)',
   },
   played: {

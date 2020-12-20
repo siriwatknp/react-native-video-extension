@@ -17,6 +17,11 @@ const Home = ({ navigation }: HomeProps) => (
       onPress={() => navigation.navigate("Player")}
     />
     <View style={{ height: 24 }} />
+      <Button
+        title="Players"
+        onPress={() => navigation.navigate("Players")}
+      />
+      <View style={{ height: 24 }} />
     <Button
       title="Layout"
       onPress={() => navigation.navigate("Layout")}
