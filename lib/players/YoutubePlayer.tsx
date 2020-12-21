@@ -1,5 +1,5 @@
 import React from 'react';
-import { useWindowDimensions, View, ViewProps } from 'react-native';
+import { Platform, useWindowDimensions, View, ViewProps } from 'react-native';
 import Video, { VideoProperties } from 'react-native-video';
 import { useVideoCtx } from '../ScreenContainer';
 import useControllerStyles from '../useControllerStyles';
@@ -65,7 +65,7 @@ const YoutubePlayer = ({
     width: '100%',
     height: undefined,
     aspectRatio: 16 / 9,
-  };
+  } as const;
   const fullscreenStyle = getLayoutStyle[mode]?.(fullscreenData);
   return (
     <InternalProvider initialPaused={initialPaused}>
@@ -128,7 +128,8 @@ const YoutubePlayer = ({
                 <View
                   style={{
                     width: '100%',
-                    bottom: fullscreen ? 0 : SNAP_BOTTOM,
+                    bottom:
+                      fullscreen || Platform.OS === 'android' ? 0 : SNAP_BOTTOM,
                     paddingHorizontal: fullscreen ? 20 : 0,
                   }}
                 >
@@ -155,7 +156,7 @@ const YoutubePlayer = ({
               </View>
             </Overlay>
           </View>
-          <Background fullscreen={!!fullscreen} />
+          {/*<Background fullscreen={!!fullscreen} />*/}
         </View>
       )}
     </InternalProvider>

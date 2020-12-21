@@ -44,6 +44,7 @@ const Players = ({ navigation }: PlayersProps) => {
         <ScrollView
           scrollEnabled={!fullscreen && !seeking}
           contentContainerStyle={fullscreen && { width, height }}
+          style={{ flex: 1 }}
         >
           <HeaderAdjustment navigation={navigation} />
           <View style={{ flex: 1 }}>

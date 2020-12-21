@@ -67,11 +67,9 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#000',
     zIndex: 1000,
-    overflow: 'visible',
   },
   initialContainer: {
     width: '100%',
-    overflow: 'visible',
   },
   fullscreenContainer: {
     position: 'absolute',

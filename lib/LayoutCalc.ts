@@ -7,7 +7,7 @@ import {
   GUTTER_PX,
   isZeroInsets,
 } from './utils';
-import {FullscreenOrientation, VideoContext} from './ScreenContainer';
+import { VideoContext } from './ScreenContainer';
 
 interface WindowDimension {
   width: number;
@@ -212,6 +212,7 @@ export const getPlayerTranslate2D = (
   return [];
 };
 
+// todo: write test getAutoFitSeekDiff
 export const getAutoFitSeekDiff = (
   fullscreen: boolean,
   isLandscapeVideo: boolean,
@@ -232,15 +233,11 @@ export const getAutoFitSeekDiff = (
   return 'dx';
 };
 
+// todo: write test getContainSeekDiff
 export const getContainSeekDiff = (fullscreen: VideoContext['fullscreen']) => {
-  const { width, height } = Dimensions.get('window');
   if (fullscreen) {
     if (OrientationLocker.isPortraitLocked) {
       return fullscreen === 'PORTRAIT' ? 'dx' : 'dy';
-    }
-    if (width > height) {
-      // isLandscapeDevice
-      return 'dy';
     }
   }
   return 'dx';
