@@ -61,6 +61,7 @@ const Seeker = ({
   const scaleAnim = useScaleSpring(consoleHidden);
   const [seeking, setSeeking] = useState(false);
   const [seekerWidth, setSeekerWidth] = useState(0);
+  const prevSeekerWidth = useRef(seekerWidth);
   const offset = INITIAL_BUTTON_SIZE / 2;
   const totalWidth = Math.abs(seekerWidth - offset * 2);
   const position = useRef({
@@ -81,8 +82,11 @@ const Seeker = ({
     };
   }
   useEffect(() => {
-    // todo: update position when seekerWidth changes
-    console.log('position.x', position.x);
+    const newX = position.x * seekerWidth / (prevSeekerWidth.current || 1);
+    position.x = newX
+    position.animated.setValue(newX)
+    // update
+    prevSeekerWidth.current = seekerWidth
   }, [seekerWidth])
   const bundleData = (totalWidth: number, x: number) => {
     const interpolatedX = x - offset;
@@ -148,7 +152,6 @@ const Seeker = ({
         opacity: barOpacity,
       }}
       onLayout={(event) => {
-        console.log('event.nativeEvent.layout.width', event.nativeEvent.layout.width);
         setSeekerWidth(event.nativeEvent.layout.width);
       }}
       {...panResponder.panHandlers}

@@ -26,11 +26,11 @@ describe('LayoutUtil', () => {
     it('No Orientation Locked', () => {
       // @ts-ignore
       Dimensions.get.mockReturnValue({ width: 400, height: 800 });
-      expect(Device(false)).toEqual([400, 800]);
+      expect(Device(false)).toEqual([400, 800, 'PORTRAIT']);
 
       // @ts-ignore
       Dimensions.get.mockReturnValue({ width: 800, height: 400 });
-      expect(Device(false)).toEqual([400, 800]);
+      expect(Device(false)).toEqual([400, 800, 'LANDSCAPE']);
     })
   });
   describe('Contain', () => {
@@ -51,7 +51,6 @@ describe('LayoutUtil', () => {
         getCanvasContainRotation({ ...data, deviceOrientation: 'PORTRAIT' }),
       ).toEqual(0);
     });
-
     it('2.Contain: PortraitLocked / LandscapeOrientation / LandscapeVideo', () => {
       const data = {
         deviceWidth,
@@ -147,7 +146,7 @@ describe('LayoutUtil', () => {
       });
       expect(getCanvasContainRotation(data)).toEqual(0);
     });
-    it('7.Contain: PortraitUnlocked / LandscapeOrientation / LandscapeVideo', () => {
+    it('7.Contain: PortraitUnlocked / LandscapeOrientation / PortraitVideo', () => {
       const data = {
         deviceWidth,
         deviceHeight,
@@ -162,7 +161,7 @@ describe('LayoutUtil', () => {
       });
       expect(getCanvasContainRotation(data)).toEqual(0);
     });
-    it('8.Contain: PortraitUnlocked / LandscapeOrientation / LandscapeVideo', () => {
+    it('8.Contain: PortraitUnlocked / LandscapeOrientation / PortraitVideo', () => {
       const data = {
         deviceWidth,
         deviceHeight,
@@ -281,7 +280,7 @@ describe('LayoutUtil', () => {
       });
       expect(getCanvasAutoFitRotation(data)).toEqual(0);
     });
-    it('7.AutoFit: PortraitUnlocked / LandscapeOrientation / LandscapeVideo', () => {
+    it('7.AutoFit: PortraitUnlocked / LandscapeOrientation / PortraitVideo', () => {
       const data = {
         deviceWidth,
         deviceHeight,
@@ -296,7 +295,7 @@ describe('LayoutUtil', () => {
       });
       expect(getCanvasAutoFitRotation(data)).toEqual(0);
     });
-    it('8.AutoFit: PortraitUnlocked / LandscapeOrientation / LandscapeVideo', () => {
+    it('8.AutoFit: PortraitUnlocked / LandscapeOrientation / PortraitVideo', () => {
       const data = {
         deviceWidth,
         deviceHeight,

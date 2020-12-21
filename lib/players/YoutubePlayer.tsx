@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ViewProps } from 'react-native';
+import { useWindowDimensions, View, ViewProps } from 'react-native';
 import Video, { VideoProperties } from 'react-native-video';
 import { useVideoCtx } from '../ScreenContainer';
 import useControllerStyles from '../useControllerStyles';
@@ -8,6 +8,7 @@ import {
   getContainCanvasLayout,
   getAutoFitCanvasLayout,
   LayoutData,
+  Device,
 } from '../LayoutUtil';
 import useInsets from '../InsetInterface';
 import { OrientationLocker } from '../LayoutCalc';
@@ -37,6 +38,7 @@ const YoutubePlayer = ({
   videoStyle,
   ...props
 }: YoutubePlayerProps) => {
+  const size = useWindowDimensions();
   const {
     fullscreen,
     isLandscape,
@@ -52,10 +54,19 @@ const YoutubePlayer = ({
   const fullscreenData: LayoutData = {
     isPortraitLocked: OrientationLocker.isPortraitLocked,
     isLandscapeVideo: isLandscape,
-    isLandscapeDevice: (fullscreen && fullscreen.startsWith('LANDSCAPE')),
+    // @ts-ignore todo: fix type here
+    isLandscapeDevice: OrientationLocker.isPortraitLocked
+      ? fullscreen && fullscreen.startsWith('LANDSCAPE')
+      : Device()[2] === 'LANDSCAPE',
     deviceOrientation: fullscreen || 'UNKNOWN',
     insets,
   };
+  const normalStyle = {
+    width: '100%',
+    height: undefined,
+    aspectRatio: 16 / 9,
+  };
+  const fullscreenStyle = getLayoutStyle[mode]?.(fullscreenData);
   return (
     <InternalProvider initialPaused={initialPaused}>
       {({
@@ -69,17 +80,7 @@ const YoutubePlayer = ({
         onSeek,
       }) => (
         <View style={styles.container}>
-          <View
-            style={
-              fullscreen
-                ? getLayoutStyle[mode]?.(fullscreenData)
-                : {
-                    width: '100%',
-                    height: undefined,
-                    aspectRatio: 16 / 9,
-                  }
-            }
-          >
+          <View style={fullscreen ? fullscreenStyle : normalStyle}>
             <Video
               style={styles.video}
               {...props}

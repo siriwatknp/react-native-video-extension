@@ -105,7 +105,6 @@ export const getCanvasAutoFitSize = (
       };
     }
     if (isLandscapeDevice && !isLandscapeVideo) {
-      console.log('test');
       return {
         width: deviceWidth,
         height: deviceHeight - (insets?.left ?? 0) - (insets?.right ?? 0),
@@ -162,16 +161,16 @@ export const getCanvasAutoFitRotation = (data: {
   return 0;
 };
 
-export const Device = (isPortraitLocked: boolean) => {
+export const Device = (isPortraitLocked: boolean = false) => {
   const windowSize = Dimensions.get('window');
+  if (isPortraitLocked) {
+    return [windowSize.width, windowSize.height] as const;
+  }
   return [
-    !isPortraitLocked && windowSize.width > windowSize.height
-      ? windowSize.height
-      : windowSize.width,
-    !isPortraitLocked && windowSize.width > windowSize.height
-      ? windowSize.width
-      : windowSize.height,
-  ];
+    windowSize.width > windowSize.height ? windowSize.height : windowSize.width,
+    windowSize.width > windowSize.height ? windowSize.width : windowSize.height,
+    windowSize.width > windowSize.height ? 'LANDSCAPE' : 'PORTRAIT'
+  ] as const;
 };
 
 export const getAutoFitCanvasLayout = (data: LayoutData) => {
