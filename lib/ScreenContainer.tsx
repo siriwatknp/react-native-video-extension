@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import useOrientationEffect from './OrientationInterface';
+import useOrientationEffect, {
+  useDeviceOrientation,
+} from './OrientationInterface';
 import { StatusBar } from 'react-native';
 
 export type FullscreenOrientation =
@@ -62,7 +64,8 @@ const ScreenContainer = ({ children, config = {} }: ScreenContainerProps) => {
   const [paused, setPaused] = useState(false);
   const [consoleHidden, setConsoleHidden] = useState(true);
   const [isLandscape, setIsLandscape] = useState(true);
-  const fullscreenOrientation = useOrientationEffect({
+  const deviceOrientation = useDeviceOrientation()
+  useOrientationEffect({
     fullscreen,
     setFullscreen,
     isLandscape,
@@ -79,7 +82,7 @@ const ScreenContainer = ({ children, config = {} }: ScreenContainerProps) => {
       value={{
         fullscreen,
         setFullscreen,
-        enterFullscreen: () => setFullscreen(fullscreenOrientation),
+        enterFullscreen: () => setFullscreen(deviceOrientation),
         exitFullscreen: () => setFullscreen(false),
         isLandscape,
         setIsLandscape,

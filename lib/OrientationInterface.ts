@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { FullscreenOrientation, VideoContext } from './ScreenContainer';
 import { OrientationLocker } from './LayoutCalc';
-import { useWindowDimensions } from 'react-native';
+import { Dimensions, ScaledSize } from 'react-native';
 
 export type OrientationValue =
   | 'PORTRAIT'
@@ -50,11 +50,6 @@ const useOrientationEffect = ({
   setFullscreen: VideoContext['setFullscreen'];
   isLandscape: boolean;
 }) => {
-  const { width, height } = useWindowDimensions();
-  const [
-    fullscreenOrientation,
-    setOrientation,
-  ] = useState<FullscreenOrientation>('PORTRAIT');
   let Orientation = OrientationAPI;
   useEffect(() => {
     Orientation.lockToPortrait();
@@ -64,26 +59,19 @@ const useOrientationEffect = ({
   }, []);
   useEffect(() => {
     function handleOrientation(orientation: OrientationValue) {
-      if (
-        orientation === 'LANDSCAPE-LEFT' ||
-        orientation === 'LANDSCAPE-RIGHT'
-      ) {
-        setOrientation(orientation);
-        setFullscreen(orientation);
-      } else {
-        if (
-          (orientation === 'PORTRAIT' ||
-            orientation === 'PORTRAIT-UPSIDEDOWN') &&
-          fullscreen &&
-          !isLandscape
-        ) {
-          // do nothing, keep showing portrait fullscreen
-        } else if (orientation === 'FACE-UP' && fullscreen) {
-          // do nothing, keep showing fullscreen
-        } else if (orientation !== 'UNKNOWN') {
+      if (OrientationLocker.isPortraitLocked) {
+        if (fullscreen && orientation === 'PORTRAIT') {
           setFullscreen(false);
         }
-        setOrientation('PORTRAIT');
+        if (
+          orientation === 'LANDSCAPE-LEFT' ||
+          orientation === 'LANDSCAPE-RIGHT'
+        ) {
+          setFullscreen(orientation);
+        }
+        else {
+          setFullscreen(false);
+        }
       }
     }
     Orientation.addDeviceOrientationListener(handleOrientation);
@@ -91,11 +79,68 @@ const useOrientationEffect = ({
       Orientation.removeDeviceOrientationListener(handleOrientation);
     };
   }, [Orientation, isLandscape, fullscreen]);
-  return !OrientationLocker.isPortraitLocked
-    ? width > height
-      ? 'LANDSCAPE-LEFT'
-      : 'PORTRAIT'
-    : fullscreenOrientation;
+
+  useEffect(() => {
+    function handleOrientation({
+      screen: { width, height },
+    }: {
+      screen: ScaledSize;
+    }) {
+      if (!OrientationLocker.isPortraitLocked) {
+        setFullscreen(width > height ? 'LANDSCAPE-LEFT' : false)
+      }
+    }
+    Dimensions.addEventListener('change', handleOrientation);
+
+    return () => {
+      Dimensions.removeEventListener('change', handleOrientation);
+    };
+  }, []);
+};
+
+export const useDeviceOrientation = () => {
+  let Orientation = OrientationAPI;
+  const [
+    deviceOrientation,
+    setDeviceOrientation,
+  ] = useState<FullscreenOrientation>('PORTRAIT');
+  useEffect(() => {
+    function handleOrientation(orientation: OrientationValue) {
+      if (OrientationLocker.isPortraitLocked) {
+        if (
+          orientation === 'LANDSCAPE-LEFT' ||
+          orientation === 'LANDSCAPE-RIGHT'
+        ) {
+          setDeviceOrientation(orientation);
+        } else {
+          setDeviceOrientation('PORTRAIT');
+        }
+      }
+    }
+    Orientation.addDeviceOrientationListener(handleOrientation);
+    return () => {
+      Orientation.removeDeviceOrientationListener(handleOrientation);
+    };
+  }, [Orientation]);
+
+  useEffect(() => {
+    function handleOrientation({
+      screen: { width, height },
+    }: {
+      screen: ScaledSize;
+    }) {
+      if (!OrientationLocker.isPortraitLocked) {
+        setDeviceOrientation(width > height ? 'LANDSCAPE-LEFT' : 'PORTRAIT');
+      }
+    }
+    Dimensions.addEventListener('change', handleOrientation);
+
+    return () => {
+      Dimensions.removeEventListener('change', handleOrientation);
+    };
+  }, []);
+
+  return deviceOrientation;
 };
 
 export default useOrientationEffect;

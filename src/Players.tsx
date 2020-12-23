@@ -29,6 +29,9 @@ export type PlayersProps = {
 const HeaderAdjustment = ({ navigation }: PlayersProps) => {
   const { fullscreen } = useVideoCtx();
   useEffect(() => {
+    navigation.setOptions({
+      gestureEnabled: false,
+    })
     Orientation.unlockAllOrientations();
     navigation.setOptions({ headerShown: !fullscreen });
   }, [fullscreen]);
@@ -60,7 +63,7 @@ const Players = ({ navigation }: PlayersProps) => {
               <Text>Switch to {isLandscape ? 'Portrait' : 'Landscape'}</Text>
             </TouchableOpacity>
             <YoutubePlayer
-              mode={'contain'}
+              mode={'auto-fit'}
               muted
               initialPaused
               source={{

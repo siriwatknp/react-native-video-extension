@@ -1,9 +1,8 @@
 import React from 'react';
-import { Platform, useWindowDimensions, View, ViewProps } from 'react-native';
+import { Platform, View, ViewProps } from 'react-native';
 import Video, { VideoProperties } from 'react-native-video';
 import { useVideoCtx } from '../ScreenContainer';
 import useControllerStyles from '../useControllerStyles';
-import Background from '../Background';
 import {
   getContainCanvasLayout,
   getAutoFitCanvasLayout,
@@ -16,11 +15,13 @@ import { AspectRatio } from '../utils';
 import Overlay from '../Overlay';
 import Seeker, { SNAP_BOTTOM } from '../Seeker/Seeker';
 import Timer from '../Timer';
+import Center from '../Section/Center';
 import FullscreenToggle from '../controls/FullscreenToggle';
 import PlayPauseRefresh from '../controls/PlayPauseRefresh';
 import Replay from '../controls/Replay';
 import Forward from '../controls/Forward';
 import { InternalProvider } from '../InternalCtx';
+import { useDeviceOrientation } from '../OrientationInterface';
 
 export type YoutubePlayerProps = {
   style?: ViewProps['style'];
@@ -38,7 +39,6 @@ const YoutubePlayer = ({
   videoStyle,
   ...props
 }: YoutubePlayerProps) => {
-  const size = useWindowDimensions();
   const {
     fullscreen,
     isLandscape,
@@ -46,6 +46,7 @@ const YoutubePlayer = ({
     consoleHidden,
   } = useVideoCtx();
   const insets = useInsets();
+  const deviceOrientation = useDeviceOrientation();
   const styles = useControllerStyles(initialAspectRatio, isLandscape);
   const getLayoutStyle = {
     'auto-fit': getAutoFitCanvasLayout,
@@ -54,11 +55,8 @@ const YoutubePlayer = ({
   const fullscreenData: LayoutData = {
     isPortraitLocked: OrientationLocker.isPortraitLocked,
     isLandscapeVideo: isLandscape,
-    // @ts-ignore todo: fix type here
-    isLandscapeDevice: OrientationLocker.isPortraitLocked
-      ? fullscreen && fullscreen.startsWith('LANDSCAPE')
-      : Device()[2] === 'LANDSCAPE',
-    deviceOrientation: fullscreen || 'UNKNOWN',
+    isLandscapeDevice: deviceOrientation.startsWith('LANDSCAPE'),
+    deviceOrientation,
     insets,
   };
   const normalStyle = {
@@ -106,24 +104,12 @@ const YoutubePlayer = ({
               resizeMode={'contain'}
             />
             <Overlay>
+              <Center>
+                <Replay />
+                <PlayPauseRefresh />
+                <Forward />
+              </Center>
               <View style={{ flex: 1, alignSelf: 'stretch' }}>
-                <View
-                  style={{
-                    zIndex: 1,
-                    position: 'absolute',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    height: 80,
-                    width: '100%',
-                    top: '50%',
-                    transform: [{ translateY: -40 }],
-                  }}
-                >
-                  <Replay />
-                  <PlayPauseRefresh />
-                  <Forward />
-                </View>
                 <View style={{ flex: 1 }} />
                 <View
                   style={{
@@ -156,7 +142,6 @@ const YoutubePlayer = ({
               </View>
             </Overlay>
           </View>
-          {/*<Background fullscreen={!!fullscreen} />*/}
         </View>
       )}
     </InternalProvider>

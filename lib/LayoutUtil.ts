@@ -197,6 +197,7 @@ export const getAutoFitCanvasLayout = (data: LayoutData) => {
 };
 
 export const getContainCanvasLayout = (data: LayoutData) => {
+  console.log('data', data);
   const [deviceWidth, deviceHeight] = Device(data.isPortraitLocked);
   const { width, height } = getCanvasContainSize({
     ...data,
