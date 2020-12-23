@@ -11,6 +11,7 @@ import Orientation from 'react-native-orientation-locker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import YoutubePlayer from '../lib/players/YoutubePlayer';
+// import FacebookPlayer from '../lib/players/FacebookPlayer';
 import { RootStackParamList } from '../App';
 import { ScreenContainer } from '../lib';
 import { useVideoCtx } from '../lib/ScreenContainer';

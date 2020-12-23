@@ -1,9 +1,10 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Animated,
   GestureResponderEvent,
   PanResponder,
   PanResponderGestureState,
+  StyleProp,
   StyleSheet,
   View,
   ViewStyle,
@@ -20,12 +21,25 @@ export type SeekerEventData = {
 };
 export type SeekerProps = {
   mode: 'auto-fit' | 'contain';
-  filledColor?: string;
-  buttonColor?: string;
+  config?: Partial<{
+    filledColor?: string;
+    buttonColor?: string;
+    thumbSize?: number;
+    barHeight?: number;
+    initialButtonSize?: number;
+    touchedButtonSize?: number;
+  }>;
   buffer?: number;
   onSeek?: (data: SeekerEventData) => void;
   innerRef?: any;
-  style?: ViewStyle;
+  styles?: Partial<{
+    seeker: StyleProp<ViewStyle>;
+    duration: StyleProp<ViewStyle>;
+    buffer: StyleProp<ViewStyle>;
+    played: StyleProp<ViewStyle>;
+    thumb: StyleProp<ViewStyle>;
+    innerThumb: StyleProp<ViewStyle>;
+  }>;
 };
 
 const within = (min: number, number: number, max: number) => {
@@ -42,16 +56,26 @@ const TOUCHED_BUTTON_SIZE = 24;
 
 export const SNAP_BOTTOM = -THUMB_SIZE / 2 + BAR_HEIGHT / 2;
 
+/**
+ * Note: Seeker's width should not changed when seeking, be careful!
+ */
 const Seeker = ({
   mode,
-  filledColor = DEFAULT_COLOR,
-  buttonColor = DEFAULT_COLOR,
+  config = {},
   buffer = 0,
   onSeek,
   children,
   innerRef,
-  style,
+  styles,
 }: React.PropsWithChildren<SeekerProps>) => {
+  const {
+    filledColor = DEFAULT_COLOR,
+    buttonColor = DEFAULT_COLOR,
+    thumbSize = THUMB_SIZE,
+    barHeight = BAR_HEIGHT,
+    initialButtonSize = INITIAL_BUTTON_SIZE,
+    touchedButtonSize = TOUCHED_BUTTON_SIZE,
+  } = config;
   const {
     fullscreen,
     isLandscape: isLandscapeVideo,
@@ -82,12 +106,12 @@ const Seeker = ({
     };
   }
   useEffect(() => {
-    const newX = position.x * seekerWidth / (prevSeekerWidth.current || 1);
-    position.x = newX
-    position.animated.setValue(newX)
+    const newX = (position.x * seekerWidth) / (prevSeekerWidth.current || 1);
+    position.x = newX;
+    position.animated.setValue(newX);
     // update
-    prevSeekerWidth.current = seekerWidth
-  }, [seekerWidth])
+    prevSeekerWidth.current = seekerWidth;
+  }, [seekerWidth]);
   const bundleData = (totalWidth: number, x: number) => {
     const interpolatedX = x - offset;
     return {
@@ -146,11 +170,11 @@ const Seeker = ({
     <Animated.View
       testID="seeker_container"
       pointerEvents="box-only"
-      style={{
-        ...staticStyles.container,
-        ...style,
-        opacity: barOpacity,
-      }}
+      style={StyleSheet.flatten([
+        staticStyles.container,
+        styles?.seeker,
+        { opacity: barOpacity, height: thumbSize },
+      ])}
       onLayout={(event) => {
         setSeekerWidth(event.nativeEvent.layout.width);
       }}
@@ -158,48 +182,64 @@ const Seeker = ({
     >
       <View
         testID="seeker_duration"
-        style={{
-          ...staticStyles.duration,
-          height: BAR_HEIGHT,
-        }}
+        style={StyleSheet.flatten([
+          staticStyles.duration,
+          styles?.duration,
+          { height: barHeight },
+        ])}
       />
       <View
         testID="seeker_buffer"
-        style={{
-          ...staticStyles.buffer,
-          width: `${buffer * 100}%`,
-          height: BAR_HEIGHT,
-        }}
+        style={StyleSheet.flatten([
+          staticStyles.buffer,
+          styles?.buffer,
+          {
+            width: `${buffer * 100}%`,
+            height: barHeight,
+          },
+        ])}
       />
       <Animated.View
         testID="seeker_played"
-        style={{
-          ...staticStyles.played,
-          backgroundColor: filledColor,
-          height: BAR_HEIGHT,
-          right: position.animated.interpolate({
-            inputRange: [0, seekerWidth],
-            outputRange: [seekerWidth, 0],
-          }),
-        }}
+        style={StyleSheet.flatten([
+          staticStyles.played,
+          { backgroundColor: filledColor },
+          styles?.played,
+          {
+            height: barHeight,
+            right: position.animated.interpolate({
+              inputRange: [0, seekerWidth],
+              outputRange: [seekerWidth, 0],
+            }),
+          },
+        ])}
       />
       <Animated.View
         testID="seeker_thumb"
-        style={{
-          ...staticStyles.thumb,
-          transform: [{ translateX: position.animated }],
-          left: -THUMB_SIZE / 2,
-        }}
+        style={StyleSheet.flatten([
+          staticStyles.thumb,
+          styles?.thumb,
+          {
+            height: thumbSize,
+            width: thumbSize,
+            left: -thumbSize / 2,
+            transform: [{ translateX: position.animated }],
+          },
+        ])}
       >
         <Animated.View
           testID="seeker_thumb_button"
-          style={{
-            ...staticStyles.thumbButton,
-            backgroundColor: buttonColor,
-            width: seeking ? TOUCHED_BUTTON_SIZE : INITIAL_BUTTON_SIZE,
-            height: seeking ? TOUCHED_BUTTON_SIZE : INITIAL_BUTTON_SIZE,
-            transform: [{ scale: scaleAnim }],
-          }}
+          style={StyleSheet.flatten([
+            staticStyles.thumbButton,
+            { backgroundColor: buttonColor },
+            styles?.innerThumb,
+            {
+              borderRadius: thumbSize,
+              width: seeking ? touchedButtonSize : initialButtonSize,
+              height: seeking ? touchedButtonSize : initialButtonSize,
+              transform: [{ scale: scaleAnim }],
+            },
+          ])}
         />
       </Animated.View>
       {children}
@@ -212,7 +252,6 @@ const staticStyles = StyleSheet.create({
     left: 0,
     right: 0,
     justifyContent: 'center',
-    height: THUMB_SIZE,
     zIndex: 1001,
   },
   duration: {
@@ -230,13 +269,10 @@ const staticStyles = StyleSheet.create({
   },
   thumb: {
     position: 'absolute',
-    height: THUMB_SIZE,
-    width: THUMB_SIZE,
     justifyContent: 'center',
     alignItems: 'center',
   },
   thumbButton: {
-    borderRadius: THUMB_SIZE,
     elevation: 2,
     shadowColor: '#000',
     shadowOpacity: 0.24,

@@ -1,4 +1,4 @@
-import React, { useReducer, useRef, useState } from 'react';
+import React, { PropsWithChildren, useReducer, useRef, useState } from 'react';
 import Video from 'react-native-video';
 import usePaused from './usePause';
 import { useVideoCtx } from './ScreenContainer';
@@ -32,13 +32,14 @@ export const useInternalCtx = () => {
   return ctx;
 };
 
+export type InternalProviderProps = {
+  initialPaused?: boolean;
+};
+
 export const InternalProvider = ({
   initialPaused,
   children,
-}: {
-  initialPaused?: boolean;
-  children: (value: InternalCtx) => React.ReactElement;
-}) => {
+}: PropsWithChildren<InternalProviderProps>) => {
   let videoInstance = useRef<Video>();
   const { setPaused, setSeeking } = useVideoCtx();
   const paused = usePaused(initialPaused);
@@ -71,7 +72,7 @@ export const InternalProvider = ({
         mutableState.prevPaused = paused;
         setPaused(true);
         setSeeking(true);
-        seekerRef.progressStopped = true
+        seekerRef.progressStopped = true;
       }
       if (data.eventName === 'MOVE') {
         mutableState.currentTime = duration * data.ratio;
@@ -85,12 +86,10 @@ export const InternalProvider = ({
           // use setTimeout to prevent seeker thumb jumping in case that
           // RELEASE is called instantly after GRANT
           // need to use mutable state to check, look at <Video onProgress />
-          seekerRef.progressStopped = false
-        }, 30)
+          seekerRef.progressStopped = false;
+        }, 50);
       }
     },
   };
-  return (
-    <InternalCtx.Provider value={value}>{children(value)}</InternalCtx.Provider>
-  );
+  return <InternalCtx.Provider value={value}>{children}</InternalCtx.Provider>;
 };

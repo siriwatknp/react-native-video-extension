@@ -6,7 +6,7 @@ import { useOpacity } from './animation';
 export type TimerProps = {
   currentTime: number;
   duration: number;
-  hidden: boolean;
+  hidden?: boolean;
 } & ViewProps;
 
 const Timer = ({
@@ -16,7 +16,7 @@ const Timer = ({
   style,
   ...props
 }: TimerProps) => {
-  const timeOpacity = useOpacity(hidden);
+  const timeOpacity = useOpacity(hidden || false);
   return (
     <Animated.View
       style={StyleSheet.flatten([
