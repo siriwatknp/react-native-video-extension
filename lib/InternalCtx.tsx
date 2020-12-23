@@ -71,6 +71,7 @@ export const InternalProvider = ({
         mutableState.prevPaused = paused;
         setPaused(true);
         setSeeking(true);
+        seekerRef.progressStopped = true
       }
       if (data.eventName === 'MOVE') {
         mutableState.currentTime = duration * data.ratio;
@@ -80,6 +81,12 @@ export const InternalProvider = ({
         videoInstance.current?.seek(duration * data.ratio);
         setPaused(mutableState.prevPaused);
         setSeeking(false);
+        setTimeout(() => {
+          // use setTimeout to prevent seeker thumb jumping in case that
+          // RELEASE is called instantly after GRANT
+          // need to use mutable state to check, look at <Video onProgress />
+          seekerRef.progressStopped = false
+        }, 30)
       }
     },
   };

@@ -96,8 +96,11 @@ const YoutubePlayer = ({
               }}
               onProgress={(data) => {
                 setState({ ended: false, bufferTime: data.playableDuration });
-                mutableState.currentTime = data.currentTime;
-                seekerRef.seek?.(data.currentTime / duration);
+                if (!seekerRef.progressStopped) {
+                  // console.log('currentTime', data.currentTime);
+                  mutableState.currentTime = data.currentTime;
+                  seekerRef.seek?.(data.currentTime / duration);
+                }
               }}
               paused={paused}
               controls={false}
