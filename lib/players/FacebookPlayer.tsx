@@ -13,6 +13,8 @@ import RNVideo from '../Video/RNVideo';
 import VideoContainer from '../Video/VideoContainer';
 import { useInternalCtx } from '../InternalCtx';
 import Text from '../controls/Text';
+import VolumeToggle from '../controls/VolumeToggle';
+import {useVideoCtx} from "../ScreenContainer";
 
 const TimePlayed = () => {
   const { mutableState } = useInternalCtx();
@@ -34,23 +36,27 @@ export type FacebookPlayerProps = {
   style?: ViewProps['style'];
   videoStyle?: VideoProperties['style'];
   initialPaused?: boolean;
+  initialMuted?: boolean;
   initialAspectRatio?: AspectRatio;
   mode: 'auto-fit' | 'contain';
 } & Omit<VideoProperties, 'paused'>;
 
 const FacebookPlayer = ({
   mode,
-  initialPaused,
+  initialPaused = false,
+  initialMuted = false,
   initialAspectRatio = 'landscape',
   style,
   videoStyle,
   ...props
 }: FacebookPlayerProps) => {
+  const { fullscreen } = useVideoCtx()
   return (
     <VideoContainer
       mode={mode}
       initialAspectRatio={initialAspectRatio}
       initialPaused={initialPaused}
+      initialMuted={initialMuted}
     >
       <RNVideo style={{ width: '100%', height: '100%' }} {...props} />
       <Overlay>
@@ -66,6 +72,7 @@ const FacebookPlayer = ({
               width: '100%',
               flexDirection: 'row',
               alignItems: 'center',
+              marginBottom: fullscreen ? 16 : 0,
             }}
           >
             <TimePlayed />
@@ -86,7 +93,8 @@ const FacebookPlayer = ({
               }}
             />
             <TimeLeft />
-            <FullscreenToggle style={{ marginRight: 8 }} />
+            <VolumeToggle style={{ marginRight: 8 }} />
+            <FullscreenToggle />
           </View>
         </View>
       </Overlay>

@@ -18,8 +18,6 @@ export interface VideoContext {
   >;
   seeking: boolean;
   setSeeking: React.Dispatch<React.SetStateAction<boolean>>;
-  paused: boolean;
-  setPaused: React.Dispatch<React.SetStateAction<boolean>>;
   consoleHidden: boolean;
   setConsoleHidden: React.Dispatch<React.SetStateAction<boolean>>;
   isLandscape: boolean;
@@ -61,7 +59,6 @@ const ScreenContainer = ({ children, config = {} }: ScreenContainerProps) => {
     false,
   );
   const [seeking, setSeeking] = useState(false);
-  const [paused, setPaused] = useState(false);
   const [consoleHidden, setConsoleHidden] = useState(true);
   const [isLandscape, setIsLandscape] = useState(true);
   const deviceOrientation = useDeviceOrientation();
@@ -88,8 +85,6 @@ const ScreenContainer = ({ children, config = {} }: ScreenContainerProps) => {
         setIsLandscape,
         seeking,
         setSeeking,
-        paused,
-        setPaused,
         consoleHidden,
         setConsoleHidden,
         config: {

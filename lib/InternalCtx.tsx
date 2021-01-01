@@ -1,11 +1,13 @@
 import React, { PropsWithChildren, useReducer, useRef, useState } from 'react';
 import Video from 'react-native-video';
-import usePaused from './usePause';
 import { useVideoCtx } from './ScreenContainer';
 import { SeekerProps } from './Seeker/Seeker';
 
 type InternalCtx = {
+  muted: boolean;
+  setMuted: React.Dispatch<React.SetStateAction<boolean>>;
   paused: boolean;
+  setPaused: React.Dispatch<React.SetStateAction<boolean>>;
   videoInstance: React.MutableRefObject<Video | undefined>;
   seekerRef: any;
   forceUpdate: (value: {}) => void;
@@ -34,15 +36,18 @@ export const useInternalCtx = () => {
 
 export type InternalProviderProps = {
   initialPaused?: boolean;
+  initialMuted?: boolean;
 };
 
 export const InternalProvider = ({
-  initialPaused,
+  initialPaused = false,
+  initialMuted = false,
   children,
 }: PropsWithChildren<InternalProviderProps>) => {
   let videoInstance = useRef<Video>();
-  const { setPaused, setSeeking } = useVideoCtx();
-  const paused = usePaused(initialPaused);
+  const { setSeeking } = useVideoCtx();
+  const [paused, setPaused] = useState(initialPaused);
+  const [muted, setMuted] = useState(initialMuted);
   const seekerRef = useRef<any>({}).current;
   const [{ duration, bufferTime, ended }, setState] = useReducer<Reducer>(
     (s, a) => ({ ...s, ...a }),
@@ -54,11 +59,14 @@ export const InternalProvider = ({
   );
   const forceUpdate = useState({})[1];
   const mutableState = useRef({
-    prevPaused: paused,
+    prevPaused: initialPaused,
     currentTime: 0,
   }).current;
   const value: InternalCtx = {
     paused,
+    setPaused,
+    muted,
+    setMuted,
     videoInstance,
     seekerRef,
     duration,

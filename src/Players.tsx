@@ -45,7 +45,7 @@ const getStyle = (active = false) =>
       alignItems: 'center',
       padding: 12,
       borderRadius: 4,
-      backgroundColor: active ? '#e4f7ff' : '#e9e9e9',
+      backgroundColor: active ? '#e4f7ff' : '#fff',
       borderWidth: active ? 1 : 0,
       borderColor: '#045ea0',
     },
@@ -100,8 +100,8 @@ const Players = ({ navigation }: PlayersProps) => {
             </View>
             <APlayer
               mode={'auto-fit'}
-              muted
               initialPaused
+              initialMuted
               source={{
                 uri: isLandscape
                   ? 'https://stream.mux.com/G00t93XO3sf44WxV9N9ts1fpIHvXgLy72x86wW00lq8s4.m3u8'

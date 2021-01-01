@@ -11,8 +11,14 @@ import { useInternalCtx } from '../InternalCtx';
 export type PlayPauseProps = TouchableOpacityProps;
 
 const PlayPauseRefresh = ({ style, onPress, ...props }: PlayPauseProps) => {
-  const { videoInstance, ended, setState } = useInternalCtx();
-  const { paused, setPaused, fullscreen, isLandscape } = useVideoCtx();
+  const { fullscreen, isLandscape } = useVideoCtx();
+  const {
+    videoInstance,
+    ended,
+    setState,
+    paused,
+    setPaused,
+  } = useInternalCtx();
   const buttonStyle = fullscreen
     ? isLandscape
       ? styles.playFullscreenLandscape

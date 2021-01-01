@@ -9,6 +9,7 @@ import { SNAP_BOTTOM } from '../Seeker/Seeker';
 import Timer from '../controls/Timer';
 import Center from '../Section/Center';
 import FullscreenToggle from '../controls/FullscreenToggle';
+import VolumeToggle from '../controls/VolumeToggle';
 import PlayPauseRefresh from '../controls/PlayPauseRefresh';
 import Replay from '../controls/Replay';
 import Forward from '../controls/Forward';
@@ -69,12 +70,17 @@ const YoutubePlayer = ({
               paddingHorizontal: fullscreen ? 20 : 0,
             }}
           >
-            <FullscreenToggle
+            <View
               style={{
                 alignSelf: 'flex-end',
+                flexDirection: 'row',
+                alignItems: 'center',
                 ...(!fullscreen && { marginRight: 8, marginBottom: -8 }),
               }}
-            />
+            >
+              <VolumeToggle style={{ marginRight: 8 }} />
+              <FullscreenToggle />
+            </View>
             <EnhancedSeeker mode={mode} progressObserver={progressObserver}>
               <EnhancedTimer />
             </EnhancedSeeker>

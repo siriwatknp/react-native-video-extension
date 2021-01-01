@@ -5,3 +5,5 @@ export { default as SvgPause } from './SvgPause';
 export { default as SvgReplay10 } from './SvgReplay10';
 export { default as SvgForward10 } from './SvgForward10';
 export { default as SvgRefresh } from './SvgRefresh';
+export { default as SvgVolumeOff } from './SvgVolumeOff';
+export { default as SvgVolumeUp } from './SvgVolumeUp';

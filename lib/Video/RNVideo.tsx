@@ -15,6 +15,7 @@ const RNVideo = forwardRef<
     duration,
     paused,
   } = useInternalCtx();
+  const { muted } = useInternalCtx();
   const { setIsLandscape } = useVideoCtx();
   return (
     <Video
@@ -49,6 +50,7 @@ const RNVideo = forwardRef<
           seekerRef.seek?.(data.currentTime / duration);
         }
       }}
+      muted={muted}
       paused={paused}
       controls={false}
       resizeMode={'contain'}
