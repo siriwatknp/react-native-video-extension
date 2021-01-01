@@ -1,5 +1,5 @@
-import React from 'react';
-import { Platform, View, ViewProps } from 'react-native';
+import React, { useRef } from 'react';
+import { Platform, View, ViewProps, Animated } from 'react-native';
 import { VideoProperties } from 'react-native-video';
 import { useVideoCtx } from '../ScreenContainer';
 import { useInternalCtx } from '../InternalCtx';
@@ -15,6 +15,7 @@ import Forward from '../controls/Forward';
 import RNVideo from '../Video/RNVideo';
 import VideoContainer from '../Video/VideoContainer';
 import EnhancedSeeker from '../Seeker/EnhancedSeeker';
+import EnhancedTimelineBar from '../Seeker/EnhancedTimelineBar';
 
 const EnhancedTimer = () => {
   const { fullscreen } = useVideoCtx();
@@ -44,7 +45,8 @@ const YoutubePlayer = ({
   videoStyle,
   ...props
 }: YoutubePlayerProps) => {
-  const { fullscreen } = useVideoCtx();
+  const { fullscreen, consoleHidden } = useVideoCtx();
+  const progressObserver = useRef(new Animated.Value(0)).current;
   return (
     <VideoContainer
       mode={mode}
@@ -73,12 +75,23 @@ const YoutubePlayer = ({
                 ...(!fullscreen && { marginRight: 8, marginBottom: -8 }),
               }}
             />
-            <EnhancedSeeker mode={mode}>
+            <EnhancedSeeker mode={mode} progressObserver={progressObserver}>
               <EnhancedTimer />
             </EnhancedSeeker>
           </View>
         </View>
       </Overlay>
+      <View
+        style={{
+          width: '100%',
+          position: 'absolute',
+          bottom: 2,
+          opacity: !fullscreen && consoleHidden ? 1 : 0,
+        }}
+        pointerEvents={'none'}
+      >
+        <EnhancedTimelineBar progress={progressObserver} />
+      </View>
     </VideoContainer>
   );
 };

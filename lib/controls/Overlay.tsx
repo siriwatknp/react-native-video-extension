@@ -36,6 +36,7 @@ const Overlay = ({ children }: React.PropsWithChildren<OverlayProps>) => {
 
 const styles = StyleSheet.create({
   overlay: {
+    zIndex: 1,
     position: 'absolute',
     top: 0,
     left: 0,

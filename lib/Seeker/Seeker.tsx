@@ -6,12 +6,12 @@ import {
   PanResponderGestureState,
   StyleProp,
   StyleSheet,
-  View,
   ViewStyle,
 } from 'react-native';
 import { getAutoFitSeekDiff, getContainSeekDiff } from '../LayoutCalc';
 import { useVideoCtx } from '../ScreenContainer';
 import { useOpacity, useScaleSpring } from '../animation';
+import TimelineBar from './TimelineBar';
 
 export type SeekerEventData = {
   eventName: 'GRANT' | 'MOVE' | 'RELEASE';
@@ -30,8 +30,10 @@ export type SeekerProps = {
     touchedButtonSize?: number;
   }>;
   buffer?: number;
+  thumbHidden?: boolean;
   onSeek?: (data: SeekerEventData) => void;
   innerRef?: any;
+  progressObserver?: Animated.Value;
   styles?: Partial<{
     seeker: StyleProp<ViewStyle>;
     duration: StyleProp<ViewStyle>;
@@ -61,10 +63,12 @@ export const SNAP_BOTTOM = -THUMB_SIZE / 2 + BAR_HEIGHT / 2;
  */
 const Seeker = ({
   mode,
+  thumbHidden,
   config = {},
   buffer = 0,
   onSeek,
   children,
+  progressObserver,
   innerRef,
   styles,
 }: React.PropsWithChildren<SeekerProps>) => {
@@ -103,6 +107,7 @@ const Seeker = ({
       const nextPosition = ratio * totalWidth + offset;
       position.x = nextPosition;
       position.animated.setValue(nextPosition);
+      progressObserver && progressObserver.setValue(nextPosition);
     };
   }
   useEffect(() => {
@@ -111,6 +116,7 @@ const Seeker = ({
         (position.x * seekerWidth) / (prevSeekerWidth.current || seekerWidth);
       position.x = newX;
       position.animated.setValue(newX);
+      progressObserver && progressObserver.setValue(newX);
       // update
       prevSeekerWidth.current = seekerWidth;
     }
@@ -129,6 +135,7 @@ const Seeker = ({
     setSeeking(true);
     position.x = locationX;
     position.animated.setValue(locationX);
+    progressObserver && progressObserver.setValue(locationX);
     onSeek?.({
       eventName: 'GRANT',
       ...bundleData(totalWidth, position.x),
@@ -141,6 +148,7 @@ const Seeker = ({
     const result = position.x + gestureState[diff];
     if (result >= offset && result <= seekerWidth - offset) {
       position.animated.setValue(result);
+      progressObserver && progressObserver.setValue(result);
       onSeek?.({ eventName: 'MOVE', ...bundleData(totalWidth, result) });
     }
   };
@@ -184,68 +192,43 @@ const Seeker = ({
       }}
       {...panResponder.panHandlers}
     >
-      <View
-        testID="seeker_duration"
-        style={StyleSheet.flatten([
-          staticStyles.duration,
-          styles?.duration,
-          { height: barHeight },
-        ])}
+      <TimelineBar
+        styles={styles}
+        barHeight={barHeight}
+        buffer={buffer}
+        filledColor={filledColor}
+        progress={position.animated}
       />
-      <View
-        testID="seeker_buffer"
-        style={StyleSheet.flatten([
-          staticStyles.buffer,
-          styles?.buffer,
-          {
-            width: `${buffer * 100}%`,
-            height: barHeight,
-          },
-        ])}
-      />
-      <Animated.View
-        testID="seeker_played"
-        style={StyleSheet.flatten([
-          staticStyles.played,
-          { backgroundColor: filledColor },
-          styles?.played,
-          {
-            height: barHeight,
-            right: position.animated.interpolate({
-              inputRange: [0, seekerWidth],
-              outputRange: [seekerWidth, 0],
-            }),
-          },
-        ])}
-      />
-      <Animated.View
-        testID="seeker_thumb"
-        style={StyleSheet.flatten([
-          staticStyles.thumb,
-          styles?.thumb,
-          {
-            height: thumbSize,
-            width: thumbSize,
-            left: -thumbSize / 2,
-            transform: [{ translateX: position.animated }],
-          },
-        ])}
-      >
+      {!thumbHidden && (
         <Animated.View
-          testID="seeker_thumb_button"
+          testID="seeker_thumb"
           style={StyleSheet.flatten([
-            staticStyles.thumbButton,
-            { backgroundColor: buttonColor },
-            styles?.innerThumb,
+            staticStyles.thumb,
+            styles?.thumb,
             {
-              borderRadius: thumbSize,
-              width: seeking ? touchedButtonSize : initialButtonSize,
-              height: seeking ? touchedButtonSize : initialButtonSize,
-              transform: [{ scale: scaleAnim }],
+              height: thumbSize,
+              width: thumbSize,
+              left: -thumbSize / 2,
+              transform: [{ translateX: position.animated }],
             },
           ])}
-        />
-      </Animated.View>
+        >
+          <Animated.View
+            testID="seeker_thumb_button"
+            style={StyleSheet.flatten([
+              staticStyles.thumbButton,
+              { backgroundColor: buttonColor },
+              styles?.innerThumb,
+              {
+                borderRadius: thumbSize,
+                width: seeking ? touchedButtonSize : initialButtonSize,
+                height: seeking ? touchedButtonSize : initialButtonSize,
+                transform: [{ scale: scaleAnim }],
+              },
+            ])}
+          />
+        </Animated.View>
+      )}
       {children}
     </Animated.View>
   );

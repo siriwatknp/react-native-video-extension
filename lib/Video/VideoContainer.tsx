@@ -19,6 +19,7 @@ export type VideoContainerProps = {
 
 const VideoContainer = ({
   mode,
+  initialPaused,
   children,
 }: PropsWithChildren<VideoContainerProps>) => {
   const { fullscreen, isLandscape } = useVideoCtx();
@@ -42,7 +43,7 @@ const VideoContainer = ({
   } as const;
   const fullscreenStyle = getLayoutStyle[mode]?.(fullscreenData);
   return (
-    <InternalProvider>
+    <InternalProvider initialPaused={initialPaused}>
       <View
         style={StyleSheet.flatten([
           styles.container,
