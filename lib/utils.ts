@@ -59,13 +59,6 @@ export const getThumbPosition = (
   );
 };
 
-export const getThumbTopOffset = (
-  seekerThickness: number,
-  thumbRadius: number,
-) => {
-  return -(thumbRadius * 2 - seekerThickness) / 2;
-};
-
 export const calculateRotationDegree = (
   isLandscape: boolean,
   fullscreen?: VideoContext['fullscreen'],
@@ -81,25 +74,4 @@ export const getAspectRatio = (ratio: AspectRatio) => {
   if (typeof ratio === 'number') return ratio;
   if (ratio === 'portrait') return 3 / 4;
   return 16 / 9;
-};
-
-// todo: remove this fn if not use
-export const calculatePlayerWidth = (
-  deviceSize: { width: number; height: number },
-  videoState: { width: number; fullscreen: boolean; isLandscape: boolean },
-) => {
-  if (videoState.fullscreen) {
-    return videoState.isLandscape ? deviceSize.height : deviceSize.width;
-  }
-  return videoState.width;
-};
-
-export const calculatePlayerHeight = (
-  deviceSize: { width: number; height: number },
-  videoState: { height: number; fullscreen: boolean; isLandscape: boolean },
-) => {
-  if (videoState.fullscreen) {
-    return videoState.isLandscape ? deviceSize.width : deviceSize.height;
-  }
-  return videoState.height;
 };

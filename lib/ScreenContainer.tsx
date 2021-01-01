@@ -64,7 +64,7 @@ const ScreenContainer = ({ children, config = {} }: ScreenContainerProps) => {
   const [paused, setPaused] = useState(false);
   const [consoleHidden, setConsoleHidden] = useState(true);
   const [isLandscape, setIsLandscape] = useState(true);
-  const deviceOrientation = useDeviceOrientation()
+  const deviceOrientation = useDeviceOrientation();
   useOrientationEffect({
     fullscreen,
     setFullscreen,

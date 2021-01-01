@@ -1,11 +1,4 @@
-import {
-  Device,
-  Gap,
-  OrientationLocker,
-  getPlayerSize,
-  getSeekerWidth,
-} from './LayoutCalc';
-import {GUTTER_PX} from "./utils";
+import { Device, Gap, OrientationLocker, getPlayerSize } from './LayoutCalc';
 
 describe('LayoutCalc', () => {
   beforeEach(() => {
@@ -163,64 +156,6 @@ describe('LayoutCalc', () => {
           marginTop: 0,
         });
       });
-    });
-  });
-
-  describe('getSeekerWidth', () => {
-    it('default any orientation', () => {
-      expect(
-        getSeekerWidth(
-          { width: 800, height: 400 },
-          {
-            fullscreen: false,
-            isLandscape: false,
-          },
-        ),
-      ).toEqual('100%');
-    });
-
-    it('fullscreen portrait', () => {
-      expect(
-        getSeekerWidth(
-          { width: 400, height: 800 },
-          {
-            fullscreen: true,
-            isLandscape: false,
-          },
-        ),
-      ).toEqual(400 - GUTTER_PX - GUTTER_PX);
-    });
-
-    it('fullscreen landscape', () => {
-      expect(
-        getSeekerWidth(
-          { width: 800, height: 400 },
-          {
-            fullscreen: true,
-            isLandscape: true,
-          },
-        ),
-      ).toEqual('90%');
-      expect(
-        getSeekerWidth(
-          { width: 800, height: 400 },
-          {
-            insets: { top: 48, bottom: 34, left: 0, right: 0 },
-            fullscreen: true,
-            isLandscape: true,
-          },
-        ),
-      ).toEqual('100%');
-      expect(
-        getSeekerWidth(
-          { width: 800, height: 400 },
-          {
-            insets: { top: 0, bottom: 0, left: 0, right: 0 },
-            fullscreen: true,
-            isLandscape: true,
-          },
-        ),
-      ).toEqual(800 - GUTTER_PX - GUTTER_PX);
     });
   });
 });

@@ -1,10 +1,8 @@
 import React from 'react';
 import { View, ViewProps } from 'react-native';
 import { VideoProperties } from 'react-native-video';
-import { useVideoCtx } from '../ScreenContainer';
-import useControllerStyles from '../useControllerStyles';
 import { AspectRatio, toTimeView } from '../utils';
-import Overlay from '../Overlay';
+import Overlay from '../controls/Overlay';
 import EnhancedSeeker from '../Seeker/EnhancedSeeker';
 import Center from '../Section/Center';
 import FullscreenToggle from '../controls/FullscreenToggle';
@@ -14,17 +12,21 @@ import Forward from '../controls/Forward';
 import RNVideo from '../Video/RNVideo';
 import VideoContainer from '../Video/VideoContainer';
 import { useInternalCtx } from '../InternalCtx';
-import Text  from '../controls/Text';
+import Text from '../controls/Text';
 
 const TimePlayed = () => {
   const { mutableState } = useInternalCtx();
-  return <Text style={{ width: 80 }}>{toTimeView(mutableState.currentTime)}</Text>;
+  return (
+    <Text style={{ width: 80 }}>{toTimeView(mutableState.currentTime)}</Text>
+  );
 };
 
 const TimeLeft = () => {
   const { mutableState, duration } = useInternalCtx();
   return (
-    <Text style={{ width: 80 }}>-{toTimeView(duration - mutableState.currentTime)}</Text>
+    <Text style={{ width: 80 }}>
+      -{toTimeView(duration - mutableState.currentTime)}
+    </Text>
   );
 };
 
@@ -44,15 +46,13 @@ const FacebookPlayer = ({
   videoStyle,
   ...props
 }: FacebookPlayerProps) => {
-  const { isLandscape } = useVideoCtx();
-  const styles = useControllerStyles(initialAspectRatio, isLandscape);
   return (
     <VideoContainer
       mode={mode}
       initialAspectRatio={initialAspectRatio}
       initialPaused={initialPaused}
     >
-      <RNVideo style={styles.video} {...props} />
+      <RNVideo style={{ width: '100%', height: '100%' }} {...props} />
       <Overlay>
         <Center>
           <Replay />

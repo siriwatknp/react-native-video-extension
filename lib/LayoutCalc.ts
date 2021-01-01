@@ -243,36 +243,6 @@ export const getContainSeekDiff = (fullscreen: VideoContext['fullscreen']) => {
   return 'dx';
 };
 
-export const getSeekerOffset = (info: Info) => {
-  const { insets, fullscreen, isLandscape } = info;
-  const normalGutter = { left: GUTTER_PX, right: GUTTER_PX };
-  if (!fullscreen) {
-    return {};
-  }
-  if (!isLandscape) {
-    // for Portrait Video
-    if (!insets) {
-      return { ...normalGutter, bottom: 32 }; // no external useSafeAreaInsets
-    }
-    if (insets && isZeroInsets(insets)) {
-      return { ...normalGutter, bottom: 20 }; // iPhone8
-    }
-    return { ...normalGutter, bottom: 0 }; // iPhone11+
-  }
-  // for Landscape Video
-  if (!insets) {
-    return {
-      left: `${GUTTER_PERCENT}%`,
-      right: `${GUTTER_PERCENT}%`,
-      bottom: 20,
-    };
-  }
-  if (insets && isZeroInsets(insets)) {
-    return { ...normalGutter, bottom: 20 }; // iPhone8
-  }
-  return { ...normalGutter, bottom: 20 }; // iPhone11+
-};
-
 export const getExitFullscreenOffset = (
   isLandscape: boolean,
   insets?: Inset,
@@ -300,30 +270,4 @@ export const getExitFullscreenOffset = (
     bottom: 56,
     right: `${GUTTER_PERCENT}%`,
   };
-};
-
-export const getSeekerWidth = (
-  windowSize: WindowDimension,
-  { insets, fullscreen, isLandscape }: Info,
-) => {
-  const device = Device(windowSize);
-  if (fullscreen) {
-    if (!isLandscape) return device.width - GUTTER_PX * 2;
-    if (!insets) return `${100 - GUTTER_PERCENT * 2}%`;
-    if (isZeroInsets(insets)) return device.height - GUTTER_PX * 2;
-    return '100%';
-  }
-  return '100%';
-};
-
-export const getSeekerLayout = (windowSize: WindowDimension, info: Info) => {
-  const { insets, fullscreen, isLandscape } = info;
-  const width = getSeekerWidth(windowSize, info);
-  if (!fullscreen) {
-    return { width };
-  }
-  if (!isLandscape) return { width, marginLeft: GUTTER_PX };
-  if (!insets) return { width, marginLeft: `${GUTTER_PERCENT}%` };
-  if (isZeroInsets(insets)) return { width, marginLeft: GUTTER_PX };
-  return { width };
 };

@@ -3,11 +3,10 @@ import { Platform, View, ViewProps } from 'react-native';
 import { VideoProperties } from 'react-native-video';
 import { useVideoCtx } from '../ScreenContainer';
 import { useInternalCtx } from '../InternalCtx';
-import useControllerStyles from '../useControllerStyles';
 import { AspectRatio } from '../utils';
-import Overlay from '../Overlay';
+import Overlay from '../controls/Overlay';
 import { SNAP_BOTTOM } from '../Seeker/Seeker';
-import Timer from '../Timer';
+import Timer from '../controls/Timer';
 import Center from '../Section/Center';
 import FullscreenToggle from '../controls/FullscreenToggle';
 import PlayPauseRefresh from '../controls/PlayPauseRefresh';
@@ -45,15 +44,14 @@ const YoutubePlayer = ({
   videoStyle,
   ...props
 }: YoutubePlayerProps) => {
-  const { fullscreen, isLandscape } = useVideoCtx();
-  const styles = useControllerStyles(initialAspectRatio, isLandscape);
+  const { fullscreen } = useVideoCtx();
   return (
     <VideoContainer
       mode={mode}
       initialAspectRatio={initialAspectRatio}
       initialPaused={initialPaused}
     >
-      <RNVideo style={styles.video} {...props} />
+      <RNVideo style={{ width: '100%', height: '100%' }} {...props} />
       <Overlay>
         <Center>
           <Replay />

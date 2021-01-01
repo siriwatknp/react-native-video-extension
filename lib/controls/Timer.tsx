@@ -1,7 +1,7 @@
 import React from 'react';
 import { Animated, StyleSheet, Text, ViewProps } from 'react-native';
-import { toTimeView } from './utils';
-import { useOpacity } from './animation';
+import { toTimeView } from '../utils';
+import { useOpacity } from '../animation';
 
 export type TimerProps = {
   currentTime: number;

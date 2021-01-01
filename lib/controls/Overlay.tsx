@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Animated, StyleSheet } from 'react-native';
-import { useVideoCtx } from './ScreenContainer';
-import { useOpacity } from './animation';
+import { useVideoCtx } from '../ScreenContainer';
+import { useOpacity } from '../animation';
 
 export type OverlayProps = {};
 
 const Overlay = ({ children }: React.PropsWithChildren<OverlayProps>) => {
-  const [forced, forceUpdate] = useState({});
   const { consoleHidden, setConsoleHidden, paused } = useVideoCtx();
   const opacityAnim = useOpacity(consoleHidden);
   useEffect(() => {

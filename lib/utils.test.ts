@@ -2,7 +2,6 @@ import {
   getSecondsToSeek,
   toTimeView,
   getThumbPosition,
-  getThumbTopOffset,
   calculateRotationDegree,
 } from './utils';
 
@@ -25,11 +24,6 @@ describe('utils', () => {
 
   it('getThumbPosition', () => {
     expect(getThumbPosition(100, 10, 316, 8)).toEqual(8 + 30);
-  });
-
-  it('getThumbTopOffset', () => {
-    expect(getThumbTopOffset(2, 8)).toEqual(-7);
-    expect(getThumbTopOffset(20, 8)).toEqual(2);
   });
 
   it('calculateRotationDegree', () => {

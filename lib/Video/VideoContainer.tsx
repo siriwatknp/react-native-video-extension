@@ -1,10 +1,9 @@
 import React, { PropsWithChildren } from 'react';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useVideoCtx } from '../ScreenContainer';
 import { InternalProvider, InternalProviderProps } from '../InternalCtx';
 import useInsets from '../InsetInterface';
 import { useDeviceOrientation } from '../OrientationInterface';
-import useControllerStyles from '../useControllerStyles';
 import {
   getAutoFitCanvasLayout,
   getContainCanvasLayout,
@@ -20,13 +19,11 @@ export type VideoContainerProps = {
 
 const VideoContainer = ({
   mode,
-  initialAspectRatio = 'landscape',
   children,
 }: PropsWithChildren<VideoContainerProps>) => {
   const { fullscreen, isLandscape } = useVideoCtx();
   const insets = useInsets();
   const deviceOrientation = useDeviceOrientation();
-  const styles = useControllerStyles(initialAspectRatio, isLandscape);
   const getLayoutStyle = {
     'auto-fit': getAutoFitCanvasLayout,
     contain: getContainCanvasLayout,
@@ -46,7 +43,12 @@ const VideoContainer = ({
   const fullscreenStyle = getLayoutStyle[mode]?.(fullscreenData);
   return (
     <InternalProvider>
-      <View style={styles.container}>
+      <View
+        style={StyleSheet.flatten([
+          styles.container,
+          fullscreen ? styles.fullscreenContainer : styles.initialContainer,
+        ])}
+      >
         <View style={fullscreen ? fullscreenStyle : normalStyle}>
           {children}
         </View>
@@ -54,5 +56,23 @@ const VideoContainer = ({
     </InternalProvider>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: '#000',
+    zIndex: 1000,
+  },
+  initialContainer: {
+    width: '100%',
+  },
+  fullscreenContainer: {
+    position: 'absolute',
+    zIndex: 1000000,
+    top: 0,
+    left: 0,
+    bottom: 0,
+    right: 0,
+  },
+});
 
 export default VideoContainer;
