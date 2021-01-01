@@ -14,10 +14,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Home from './src/Home';
-import Player from './src/Player';
 import Players from './src/Players';
-import Layout from './src/Layout';
-import Lock from './src/Lock';
 import Canvas from './src/Canvas';
 
 declare const global: { HermesInternal: null | {} };
@@ -26,10 +23,7 @@ const Stack = createStackNavigator();
 
 export type RootStackParamList = {
   Home: undefined;
-  Player: undefined;
   Players: undefined;
-  Layout: undefined;
-  Lock: undefined;
   Canvas: undefined;
 };
 
@@ -39,10 +33,7 @@ const App = () => {
       <NavigationContainer>
         <Stack.Navigator>
           <Stack.Screen name="Home" component={Home} />
-          <Stack.Screen name="Player" component={Player} />
           <Stack.Screen name="Players" component={Players} />
-          <Stack.Screen name="Layout" component={Layout} />
-          <Stack.Screen name="Lock" component={Lock} />
           <Stack.Screen name="Canvas" component={Canvas} />
         </Stack.Navigator>
       </NavigationContainer>

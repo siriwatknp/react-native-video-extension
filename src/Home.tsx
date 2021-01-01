@@ -12,30 +12,9 @@ export type HomeProps = {
 
 const Home = ({ navigation }: HomeProps) => (
   <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-    <Button
-      title="Video Player"
-      onPress={() => navigation.navigate("Player")}
-    />
+    <Button title="Players" onPress={() => navigation.navigate('Players')} />
     <View style={{ height: 24 }} />
-      <Button
-        title="Players"
-        onPress={() => navigation.navigate("Players")}
-      />
-      <View style={{ height: 24 }} />
-    <Button
-      title="Layout"
-      onPress={() => navigation.navigate("Layout")}
-    />
-    <View style={{ height: 24 }} />
-    <Button
-      title="Lock"
-      onPress={() => navigation.navigate("Lock")}
-    />
-    <View style={{ height: 24 }} />
-    <Button
-      title="Canvas"
-      onPress={() => navigation.navigate("Canvas")}
-    />
+    <Button title="Canvas" onPress={() => navigation.navigate('Canvas')} />
   </View>
 );
 
