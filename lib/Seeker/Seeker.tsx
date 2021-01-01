@@ -86,11 +86,11 @@ const Seeker = ({
   const [seeking, setSeeking] = useState(false);
   const [seekerWidth, setSeekerWidth] = useState(0);
   const prevSeekerWidth = useRef(seekerWidth);
-  const offset = INITIAL_BUTTON_SIZE / 2;
+  const offset = initialButtonSize / 2;
   const totalWidth = Math.abs(seekerWidth - offset * 2);
   const position = useRef({
-    x: 0,
-    animated: new Animated.Value(0),
+    x: offset,
+    animated: new Animated.Value(offset),
   }).current;
   const seekerRef = useRef<any>({}).current;
   const getDiff = {
@@ -106,12 +106,16 @@ const Seeker = ({
     };
   }
   useEffect(() => {
-    const newX = (position.x * seekerWidth) / (prevSeekerWidth.current || 1);
-    position.x = newX;
-    position.animated.setValue(newX);
-    // update
-    prevSeekerWidth.current = seekerWidth;
-  }, [seekerWidth]);
+    if (seekerWidth) {
+      const newX =
+        (position.x * seekerWidth) / (prevSeekerWidth.current || seekerWidth);
+      position.x = newX;
+      position.animated.setValue(newX);
+      // update
+      prevSeekerWidth.current = seekerWidth;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [seekerWidth]); // update position & animated when seekerWidth change (I know what I'm doing)
   const bundleData = (totalWidth: number, x: number) => {
     const interpolatedX = x - offset;
     return {
