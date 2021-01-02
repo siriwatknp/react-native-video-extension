@@ -16,7 +16,7 @@
     "copy-readme": "ncp README.md dist/README.md",
     "prebuild": "rimraf dist",
     "build": "tsc -p tsconfig.build.json && yarn copy-readme",
-    "release": "./node_modules/.bin/standard-version --first-release",
+    "release": "./node_modules/.bin/standard-version",
     "publish:npm": "node scripts/pkg.js && cd dist && yarn publish"
   },
   "dependencies": {

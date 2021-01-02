@@ -98,13 +98,12 @@ const Players = ({ navigation }: PlayersProps) => {
             </View>
             <APlayer
               mode={'auto-fit'}
-              aspectRatio={'portrait'}
               initialPaused
               initialMuted
               source={{
                 uri: isLandscape
                   ? 'https://stream.mux.com/G00t93XO3sf44WxV9N9ts1fpIHvXgLy72x86wW00lq8s4.m3u8'
-                  : 'https://stream.mux.com/M4K00I202qH2AQkbt2dW7r6l91oqTGRk5j76tKNBfdgOk.m3u8',
+                  : 'https://stream.mux.com/qfQl01jM01HuAJF3k00qvHDbqDRuZWC5GSLJ2AriaKFgl8.m3u8',
               }}
             />
             <View style={{ padding: 16 }}>
