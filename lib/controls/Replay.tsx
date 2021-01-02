@@ -1,5 +1,5 @@
-import React from 'react';
-import { SvgReplay10 } from '../../src/icons';
+import React, { PropsWithChildren } from 'react';
+import { SvgReplay10 } from '../icons';
 import {
   StyleSheet,
   TouchableOpacity,
@@ -7,9 +7,9 @@ import {
 } from 'react-native';
 import { useInternalCtx } from '../InternalCtx';
 
-export type ReplayProps = TouchableOpacityProps;
+export type ReplayProps = PropsWithChildren<TouchableOpacityProps>;
 
-const Replay = ({ style, onPress, ...props }: ReplayProps) => {
+const Replay = ({ style, onPress, children, ...props }: ReplayProps) => {
   const {
     duration,
     forceUpdate,
@@ -32,7 +32,7 @@ const Replay = ({ style, onPress, ...props }: ReplayProps) => {
       }}
       {...props}
     >
-      <SvgReplay10 />
+      {children ?? <SvgReplay10 />}
     </TouchableOpacity>
   );
 };

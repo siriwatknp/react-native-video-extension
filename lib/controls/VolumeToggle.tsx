@@ -1,5 +1,5 @@
-import React from 'react';
-import { SvgVolumeUp, SvgVolumeOff } from '../../src/icons';
+import React, { ReactElement } from 'react';
+import { SvgVolumeUp, SvgVolumeOff } from '../icons';
 import {
   StyleSheet,
   TouchableOpacity,
@@ -7,9 +7,17 @@ import {
 } from 'react-native';
 import { useInternalCtx } from '../InternalCtx';
 
-export type VolumeToggleProps = TouchableOpacityProps;
+export type VolumeToggleProps = {
+  volumeUpIcon?: ReactElement;
+  volumeOffIcon?: ReactElement;
+} & TouchableOpacityProps;
 
-const VolumeToggle = ({ style, ...props }: VolumeToggleProps) => {
+const VolumeToggle = ({
+  style,
+  volumeUpIcon,
+  volumeOffIcon,
+  ...props
+}: VolumeToggleProps) => {
   const { muted, setMuted } = useInternalCtx();
   return (
     <TouchableOpacity
@@ -17,7 +25,9 @@ const VolumeToggle = ({ style, ...props }: VolumeToggleProps) => {
       {...props}
       onPress={() => setMuted((m) => !m)}
     >
-      {muted ? <SvgVolumeOff /> : <SvgVolumeUp />}
+      {muted
+        ? volumeOffIcon ?? <SvgVolumeOff />
+        : volumeUpIcon ?? <SvgVolumeUp />}
     </TouchableOpacity>
   );
 };

@@ -14,7 +14,8 @@ import VideoContainer from '../Video/VideoContainer';
 import { useInternalCtx } from '../InternalCtx';
 import Text from '../controls/Text';
 import VolumeToggle from '../controls/VolumeToggle';
-import {useVideoCtx} from "../ScreenContainer";
+import { useVideoCtx } from '../ScreenContainer';
+import { IconConfig } from '../icons';
 
 const TimePlayed = () => {
   const { mutableState } = useInternalCtx();
@@ -37,33 +38,33 @@ export type FacebookPlayerProps = {
   videoStyle?: VideoProperties['style'];
   initialPaused?: boolean;
   initialMuted?: boolean;
-  initialAspectRatio?: AspectRatio;
+  aspectRatio?: AspectRatio;
   mode: 'auto-fit' | 'contain';
+  customIcon?: IconConfig;
 } & Omit<VideoProperties, 'paused'>;
 
 const FacebookPlayer = ({
   mode,
   initialPaused = false,
   initialMuted = false,
-  initialAspectRatio = 'landscape',
-  style,
-  videoStyle,
+  aspectRatio = 'landscape',
+  customIcon,
   ...props
 }: FacebookPlayerProps) => {
-  const { fullscreen } = useVideoCtx()
+  const { fullscreen } = useVideoCtx();
   return (
     <VideoContainer
       mode={mode}
-      initialAspectRatio={initialAspectRatio}
+      aspectRatio={aspectRatio}
       initialPaused={initialPaused}
       initialMuted={initialMuted}
     >
       <RNVideo style={{ width: '100%', height: '100%' }} {...props} />
       <Overlay>
         <Center>
-          <Replay />
-          <PlayPauseRefresh />
-          <Forward />
+          <Replay>{customIcon?.replayIcon}</Replay>
+          <PlayPauseRefresh {...customIcon} />
+          <Forward>{customIcon?.forwardIcon}</Forward>
         </Center>
         <View style={{ flex: 1, alignSelf: 'stretch' }}>
           <View style={{ flex: 1 }} />
@@ -93,8 +94,8 @@ const FacebookPlayer = ({
               }}
             />
             <TimeLeft />
-            <VolumeToggle style={{ marginRight: 8 }} />
-            <FullscreenToggle />
+            <VolumeToggle style={{ marginRight: 8 }} {...customIcon} />
+            <FullscreenToggle {...customIcon} />
           </View>
         </View>
       </Overlay>

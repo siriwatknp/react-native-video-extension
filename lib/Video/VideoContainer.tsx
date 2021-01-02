@@ -1,5 +1,5 @@
 import React, { PropsWithChildren } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { useVideoCtx } from '../ScreenContainer';
 import { InternalProvider, InternalProviderProps } from '../InternalCtx';
 import useInsets from '../InsetInterface';
@@ -10,19 +10,20 @@ import {
   LayoutData,
 } from '../LayoutUtil';
 import { OrientationLocker } from '../LayoutCalc';
-import { AspectRatio } from '../utils';
+import { AspectRatio, getAspectRatio } from '../utils';
 
 export type VideoContainerProps = {
-  initialAspectRatio?: AspectRatio;
+  aspectRatio?: AspectRatio;
   mode: 'auto-fit' | 'contain';
 } & InternalProviderProps;
 
 const VideoContainer = ({
   mode,
   initialPaused,
+  aspectRatio = 16 / 9,
   children,
 }: PropsWithChildren<VideoContainerProps>) => {
-  const { fullscreen, isLandscape } = useVideoCtx();
+  const { fullscreen, isLandscape, loading } = useVideoCtx();
   const insets = useInsets();
   const deviceOrientation = useDeviceOrientation();
   const getLayoutStyle = {
@@ -39,7 +40,7 @@ const VideoContainer = ({
   const normalStyle = {
     width: '100%',
     height: undefined,
-    aspectRatio: 16 / 9,
+    aspectRatio: getAspectRatio(aspectRatio),
   } as const;
   const fullscreenStyle = getLayoutStyle[mode]?.(fullscreenData);
   return (
@@ -53,6 +54,16 @@ const VideoContainer = ({
         <View style={fullscreen ? fullscreenStyle : normalStyle}>
           {children}
         </View>
+        {loading && (
+          <View
+            style={StyleSheet.flatten([
+              styles.fullscreenContainer,
+              styles.loadingContainer,
+            ])}
+          >
+            <ActivityIndicator color="#fff" />
+          </View>
+        )}
       </View>
     </InternalProvider>
   );
@@ -73,6 +84,11 @@ const styles = StyleSheet.create({
     left: 0,
     bottom: 0,
     right: 0,
+  },
+  loadingContainer: {
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 

@@ -13,13 +13,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import YoutubePlayer from '../lib/players/YoutubePlayer';
 import FacebookPlayer from '../lib/players/FacebookPlayer';
 import { RootStackParamList } from '../App';
-import { ScreenContainer } from '../lib';
-import { useVideoCtx } from '../lib/ScreenContainer';
+import { ScreenContainer, useVideoCtx, SvgRefresh } from '../lib';
 import { connectOrientationLib, connectUseInsets } from '../lib';
 
 connectUseInsets(useSafeAreaInsets);
-// connectOrientationLib(Orientation);
-Orientation.unlockAllOrientations();
+connectOrientationLib(Orientation);
+// Orientation.unlockAllOrientations();
 
 type PlayersNavigationProp = StackNavigationProp<RootStackParamList, 'Players'>;
 
@@ -33,9 +32,8 @@ const HeaderAdjustment = ({ navigation }: PlayersProps) => {
     navigation.setOptions({
       gestureEnabled: false,
     });
-    Orientation.unlockAllOrientations();
     navigation.setOptions({ headerShown: !fullscreen });
-  }, [fullscreen]);
+  }, [fullscreen, navigation]);
   return null;
 };
 
@@ -100,6 +98,7 @@ const Players = ({ navigation }: PlayersProps) => {
             </View>
             <APlayer
               mode={'auto-fit'}
+              aspectRatio={'portrait'}
               initialPaused
               initialMuted
               source={{
@@ -108,17 +107,19 @@ const Players = ({ navigation }: PlayersProps) => {
                   : 'https://stream.mux.com/M4K00I202qH2AQkbt2dW7r6l91oqTGRk5j76tKNBfdgOk.m3u8',
               }}
             />
-            <TouchableOpacity
-              style={{
-                padding: 8,
-                justifyContent: 'center',
-                alignItems: 'center',
-                backgroundColor: '#e9e9e9',
-              }}
-              onPress={() => setIsLandscape((bool) => !bool)}
-            >
-              <Text>Switch to {isLandscape ? 'Portrait' : 'Landscape'}</Text>
-            </TouchableOpacity>
+            <View style={{ padding: 16 }}>
+              <TouchableOpacity
+                style={{
+                  padding: 8,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: '#e9e9e9',
+                }}
+                onPress={() => setIsLandscape((bool) => !bool)}
+              >
+                <Text>Switch to {isLandscape ? 'Portrait' : 'Landscape'}</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </ScrollView>
       )}

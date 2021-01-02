@@ -17,6 +17,7 @@ import RNVideo from '../Video/RNVideo';
 import VideoContainer from '../Video/VideoContainer';
 import EnhancedSeeker from '../Seeker/EnhancedSeeker';
 import EnhancedTimelineBar from '../Seeker/EnhancedTimelineBar';
+import { IconConfig } from '../icons';
 
 const EnhancedTimer = () => {
   const { fullscreen } = useVideoCtx();
@@ -34,16 +35,18 @@ export type YoutubePlayerProps = {
   style?: ViewProps['style'];
   videoStyle?: VideoProperties['style'];
   initialPaused?: boolean;
-  initialAspectRatio?: AspectRatio;
+  initialMuted?: boolean;
+  aspectRatio?: AspectRatio;
   mode: 'auto-fit' | 'contain';
+  customIcon?: IconConfig;
 } & Omit<VideoProperties, 'paused'>;
 
 const YoutubePlayer = ({
   mode,
-  initialPaused,
-  initialAspectRatio = 'landscape',
-  style,
-  videoStyle,
+  initialPaused = false,
+  initialMuted = false,
+  aspectRatio = 'landscape',
+  customIcon,
   ...props
 }: YoutubePlayerProps) => {
   const { fullscreen, consoleHidden } = useVideoCtx();
@@ -51,15 +54,16 @@ const YoutubePlayer = ({
   return (
     <VideoContainer
       mode={mode}
-      initialAspectRatio={initialAspectRatio}
+      aspectRatio={aspectRatio}
       initialPaused={initialPaused}
+      initialMuted={initialMuted}
     >
       <RNVideo style={{ width: '100%', height: '100%' }} {...props} />
       <Overlay>
         <Center>
-          <Replay />
-          <PlayPauseRefresh />
-          <Forward />
+          <Replay>{customIcon?.replayIcon}</Replay>
+          <PlayPauseRefresh {...customIcon} />
+          <Forward>{customIcon?.forwardIcon}</Forward>
         </Center>
         <View style={{ flex: 1, alignSelf: 'stretch' }}>
           <View style={{ flex: 1 }} />
@@ -78,8 +82,8 @@ const YoutubePlayer = ({
                 ...(!fullscreen && { marginRight: 8, marginBottom: -8 }),
               }}
             >
-              <VolumeToggle style={{ marginRight: 8 }} />
-              <FullscreenToggle />
+              <VolumeToggle style={{ marginRight: 8 }} {...customIcon} />
+              <FullscreenToggle {...customIcon} />
             </View>
             <EnhancedSeeker mode={mode} progressObserver={progressObserver}>
               <EnhancedTimer />

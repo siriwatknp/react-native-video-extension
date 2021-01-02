@@ -14,9 +14,9 @@ const RNVideo = forwardRef<
     seekerRef,
     duration,
     paused,
+    muted,
   } = useInternalCtx();
-  const { muted } = useInternalCtx();
-  const { setIsLandscape } = useVideoCtx();
+  const { setIsLandscape, setLoading } = useVideoCtx();
   return (
     <Video
       {...props}
@@ -36,6 +36,7 @@ const RNVideo = forwardRef<
         onEnd?.();
         setState({ ended: true });
       }}
+      onReadyForDisplay={() => setLoading(false)}
       onLoad={(data) => {
         onLoad?.(data);
         setState({ ended: false, duration: data.duration });

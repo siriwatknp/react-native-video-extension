@@ -16,6 +16,8 @@ export interface VideoContext {
   setFullscreen: React.Dispatch<
     React.SetStateAction<VideoContext['fullscreen']>
   >;
+  loading: boolean;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   seeking: boolean;
   setSeeking: React.Dispatch<React.SetStateAction<boolean>>;
   consoleHidden: boolean;
@@ -58,6 +60,7 @@ const ScreenContainer = ({ children, config = {} }: ScreenContainerProps) => {
   const [fullscreen, setFullscreen] = useState<VideoContext['fullscreen']>(
     false,
   );
+  const [loading, setLoading] = useState(true);
   const [seeking, setSeeking] = useState(false);
   const [consoleHidden, setConsoleHidden] = useState(true);
   const [isLandscape, setIsLandscape] = useState(true);
@@ -83,6 +86,8 @@ const ScreenContainer = ({ children, config = {} }: ScreenContainerProps) => {
         exitFullscreen: () => setFullscreen(false),
         isLandscape,
         setIsLandscape,
+        loading,
+        setLoading,
         seeking,
         setSeeking,
         consoleHidden,

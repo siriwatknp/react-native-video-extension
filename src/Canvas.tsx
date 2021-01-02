@@ -5,19 +5,19 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Orientation, { OrientationType } from 'react-native-orientation-locker';
 import Background from '../lib/Background';
 import Toolbar from '../lib/Toolbar';
-import {
-  SvgFullscreen,
-  SvgPlayArrow,
-  SvgReplay10,
-  SvgForward10,
-} from './icons';
 
 import {
   getAutoFitCanvasLayout,
   getContainCanvasLayout,
 } from '../lib/LayoutUtil';
 import { RootStackParamList } from '../App';
-import { OrientationValue } from '../lib';
+import {
+  OrientationValue,
+  SvgFullscreen,
+  SvgPlayArrow,
+  SvgReplay10,
+  SvgForward10,
+} from '../lib';
 
 type CanvasNavigationProp = StackNavigationProp<RootStackParamList, 'Canvas'>;
 

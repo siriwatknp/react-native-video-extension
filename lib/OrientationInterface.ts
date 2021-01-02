@@ -56,7 +56,7 @@ const useOrientationEffect = ({
     return () => {
       Orientation.unlockAllOrientations();
     };
-  }, []);
+  }, [Orientation]);
   useEffect(() => {
     function handleOrientation(orientation: OrientationValue) {
       if (OrientationLocker.isPortraitLocked) {
@@ -68,8 +68,7 @@ const useOrientationEffect = ({
           orientation === 'LANDSCAPE-RIGHT'
         ) {
           setFullscreen(orientation);
-        }
-        else {
+        } else {
           setFullscreen(false);
         }
       }
@@ -78,7 +77,7 @@ const useOrientationEffect = ({
     return () => {
       Orientation.removeDeviceOrientationListener(handleOrientation);
     };
-  }, [Orientation, isLandscape, fullscreen]);
+  }, [Orientation, isLandscape, fullscreen, setFullscreen]);
 
   useEffect(() => {
     function handleOrientation({
@@ -87,7 +86,7 @@ const useOrientationEffect = ({
       screen: ScaledSize;
     }) {
       if (!OrientationLocker.isPortraitLocked) {
-        setFullscreen(width > height ? 'LANDSCAPE-LEFT' : false)
+        setFullscreen(width > height ? 'LANDSCAPE-LEFT' : false);
       }
     }
     Dimensions.addEventListener('change', handleOrientation);
@@ -95,7 +94,7 @@ const useOrientationEffect = ({
     return () => {
       Dimensions.removeEventListener('change', handleOrientation);
     };
-  }, []);
+  }, [setFullscreen]);
 };
 
 export const useDeviceOrientation = () => {

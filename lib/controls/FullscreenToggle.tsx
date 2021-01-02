@@ -1,5 +1,5 @@
 import React from 'react';
-import { SvgExitFullscreen, SvgFullscreen } from '../../src/icons';
+import { SvgExitFullscreen, SvgFullscreen } from '../icons';
 import {
   StyleSheet,
   TouchableOpacity,
@@ -7,9 +7,17 @@ import {
 } from 'react-native';
 import { useVideoCtx } from '../ScreenContainer';
 
-export type FullscreenToggleProps = TouchableOpacityProps;
+export type FullscreenToggleProps = {
+  fullscreenIcon?: React.ReactElement;
+  exitFullscreenIcon?: React.ReactElement;
+} & TouchableOpacityProps;
 
-const FullscreenToggle = ({ style, ...props }: FullscreenToggleProps) => {
+const FullscreenToggle = ({
+  style,
+  fullscreenIcon,
+  exitFullscreenIcon,
+  ...props
+}: FullscreenToggleProps) => {
   const { fullscreen, enterFullscreen, exitFullscreen } = useVideoCtx();
   return (
     <TouchableOpacity
@@ -17,7 +25,9 @@ const FullscreenToggle = ({ style, ...props }: FullscreenToggleProps) => {
       {...props}
       onPress={fullscreen ? exitFullscreen : enterFullscreen}
     >
-      {fullscreen ? <SvgExitFullscreen /> : <SvgFullscreen />}
+      {fullscreen
+        ? exitFullscreenIcon ?? <SvgExitFullscreen />
+        : fullscreenIcon ?? <SvgFullscreen />}
     </TouchableOpacity>
   );
 };

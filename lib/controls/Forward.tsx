@@ -1,15 +1,15 @@
-import React from 'react';
+import React, { PropsWithChildren } from 'react';
 import {
   StyleSheet,
   TouchableOpacity,
   TouchableOpacityProps,
 } from 'react-native';
-import { SvgForward10 } from '../../src/icons';
+import { SvgForward10 } from '../icons';
 import { useInternalCtx } from '../InternalCtx';
 
-export type ForwardProps = TouchableOpacityProps;
+export type ForwardProps = PropsWithChildren<TouchableOpacityProps>;
 
-const Forward = ({ style, onPress, ...props }: ForwardProps) => {
+const Forward = ({ style, onPress, children, ...props }: ForwardProps) => {
   const {
     duration,
     forceUpdate,
@@ -32,7 +32,7 @@ const Forward = ({ style, onPress, ...props }: ForwardProps) => {
       }}
       {...props}
     >
-      <SvgForward10 />
+      {children ?? <SvgForward10 />}
     </TouchableOpacity>
   );
 };

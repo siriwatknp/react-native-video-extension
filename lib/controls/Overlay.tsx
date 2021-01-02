@@ -2,11 +2,13 @@ import React, { useEffect } from 'react';
 import { Animated, StyleSheet } from 'react-native';
 import { useVideoCtx } from '../ScreenContainer';
 import { useOpacity } from '../animation';
+import { useInternalCtx } from '../InternalCtx';
 
 export type OverlayProps = {};
 
 const Overlay = ({ children }: React.PropsWithChildren<OverlayProps>) => {
-  const { consoleHidden, setConsoleHidden, paused } = useVideoCtx();
+  const { consoleHidden, setConsoleHidden } = useVideoCtx();
+  const { paused, muted } = useInternalCtx();
   const opacityAnim = useOpacity(consoleHidden);
   useEffect(() => {
     let id: NodeJS.Timeout;
@@ -17,7 +19,7 @@ const Overlay = ({ children }: React.PropsWithChildren<OverlayProps>) => {
       );
     }
     return () => clearTimeout(id);
-  }, [consoleHidden, paused]);
+  }, [consoleHidden, paused, muted, setConsoleHidden]); // when these value change will consider to reset setTimeout
   return (
     <Animated.View
       onStartShouldSetResponder={(event) => {
