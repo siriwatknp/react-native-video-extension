@@ -1,0 +1,39 @@
+name: Test-Build-Release
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[ci skip]')"
+    steps:
+      - uses: actions/checkout@v2
+      - uses: c-hive/gha-yarn-cache@v1
+      - name: Install dependencies
+        run: yarn
+      - name: Run unit-tests
+        run: yarn test
+  build-tagging:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.PAT }}
+      - uses: c-hive/gha-yarn-cache@v1
+      - name: Install dependencies
+        run: yarn
+      - name: Build
+        run: yarn build
+      - name: Git config
+        run: |
+          git config --local user.email "ci@github.actions"
+          git config --local user.name "GithubActions"
+          git remote -v
+      - name: Release
+        run: yarn release
+      - run: git push origin HEAD:main --follow-tags

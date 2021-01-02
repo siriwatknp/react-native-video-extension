@@ -1,7 +1,12 @@
 {
   "name": "react-native-video-extension",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/siriwatknp/react-native-video-extension.git"
+  },
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
@@ -11,9 +16,8 @@
     "copy-readme": "ncp README.md dist/README.md",
     "prebuild": "rimraf dist",
     "build": "tsc -p tsconfig.build.json && yarn copy-readme",
-    "prerelease": "yarn build",
-    "release": "./node_modules/.bin/standard-version",
-    "publish-package": "node scripts/pkg.js && cd dist && yarn publish"
+    "release": "./node_modules/.bin/standard-version --first-release",
+    "publish:npm": "node scripts/pkg.js && cd dist && yarn publish"
   },
   "dependencies": {
     "@react-native-community/masked-view": "^0.1.10",
