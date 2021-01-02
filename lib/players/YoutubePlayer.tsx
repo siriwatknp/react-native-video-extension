@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { Platform, View, ViewProps, Animated } from 'react-native';
 import { VideoProperties } from 'react-native-video';
+import withDefaultScreenContainer from '../DefaultScreenContainer';
 import { useVideoCtx } from '../ScreenContainer';
 import { useInternalCtx } from '../InternalCtx';
 import { AspectRatio } from '../utils';
@@ -106,4 +107,4 @@ const YoutubePlayer = ({
   );
 };
 
-export default YoutubePlayer;
+export default withDefaultScreenContainer(YoutubePlayer);

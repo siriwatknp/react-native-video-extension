@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, ViewProps } from 'react-native';
 import { VideoProperties } from 'react-native-video';
+import withDefaultScreenContainer from '../DefaultScreenContainer';
 import { AspectRatio, toTimeView } from '../utils';
 import Overlay from '../controls/Overlay';
 import EnhancedSeeker from '../Seeker/EnhancedSeeker';
@@ -94,7 +95,7 @@ const FacebookPlayer = ({
               }}
             />
             <TimeLeft />
-            <VolumeToggle style={{ marginRight: 8 }} {...customIcon} />
+            <VolumeToggle {...customIcon} />
             <FullscreenToggle {...customIcon} />
           </View>
         </View>
@@ -103,4 +104,4 @@ const FacebookPlayer = ({
   );
 };
 
-export default FacebookPlayer;
+export default withDefaultScreenContainer(FacebookPlayer);

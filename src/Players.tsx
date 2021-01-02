@@ -13,7 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import YoutubePlayer from '../lib/players/YoutubePlayer';
 import FacebookPlayer from '../lib/players/FacebookPlayer';
 import { RootStackParamList } from '../App';
-import { ScreenContainer, useVideoCtx, SvgRefresh } from '../lib';
+import { ScreenContainer, useVideoCtx } from '../lib';
 import { connectOrientationLib, connectUseInsets } from '../lib';
 
 connectUseInsets(useSafeAreaInsets);
@@ -98,12 +98,12 @@ const Players = ({ navigation }: PlayersProps) => {
             </View>
             <APlayer
               mode={'auto-fit'}
-              initialPaused
               initialMuted
+              aspectRatio={isLandscape ? 'landscape' : 'portrait'}
               source={{
                 uri: isLandscape
-                  ? 'https://stream.mux.com/G00t93XO3sf44WxV9N9ts1fpIHvXgLy72x86wW00lq8s4.m3u8'
-                  : 'https://stream.mux.com/qfQl01jM01HuAJF3k00qvHDbqDRuZWC5GSLJ2AriaKFgl8.m3u8',
+                  ? 'https://stream.mux.com/RvflnSja01tV00MWLYllWwp6GhE7t6RT01jRPfZJIwJM7I.m3u8'
+                  : 'https://stream.mux.com/Dr7x01RuyU2yQJmlY8fZ2FW62yeAV02RR5MMkys7DiG8M.m3u8',
               }}
             />
             <View style={{ padding: 16 }}>

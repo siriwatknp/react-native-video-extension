@@ -33,7 +33,7 @@ export interface VideoContext {
   };
 }
 
-const ctx = React.createContext<VideoContext | undefined>(undefined);
+export const ctx = React.createContext<VideoContext | undefined>(undefined);
 
 export const useVideoCtx = () => {
   const value = React.useContext(ctx);

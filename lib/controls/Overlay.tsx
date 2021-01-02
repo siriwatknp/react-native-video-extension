@@ -7,7 +7,7 @@ import { useInternalCtx } from '../InternalCtx';
 export type OverlayProps = {};
 
 const Overlay = ({ children }: React.PropsWithChildren<OverlayProps>) => {
-  const { consoleHidden, setConsoleHidden } = useVideoCtx();
+  const { consoleHidden, setConsoleHidden, fullscreen } = useVideoCtx();
   const { paused, muted } = useInternalCtx();
   const opacityAnim = useOpacity(consoleHidden);
   useEffect(() => {
@@ -19,7 +19,7 @@ const Overlay = ({ children }: React.PropsWithChildren<OverlayProps>) => {
       );
     }
     return () => clearTimeout(id);
-  }, [consoleHidden, paused, muted, setConsoleHidden]); // when these value change will consider to reset setTimeout
+  }, [consoleHidden, paused, muted, setConsoleHidden, fullscreen]); // when these value change will consider to reset setTimeout
   return (
     <Animated.View
       onStartShouldSetResponder={(event) => {

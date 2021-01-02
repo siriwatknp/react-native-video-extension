@@ -2,6 +2,9 @@
 
 # React Native Video (Extension)
 
+> Origin, I need to implement video player for my client but there is no library that works well with our requirement, we used `react-native-video-controls` but it is not support real fullscreen mode
+> and orientation works only horizontal, so I spent 2 weeks building this library from real world requirements (of course in my free time), and I hope that it saves a lot of your time as well.
+
 A wrapper library for [react-native-video](https://github.com/react-native-video/react-native-video) that provide great video experience for user.
 
 - support fullscreen mode for both iOS & Android
@@ -51,9 +54,8 @@ function Screen() {
 #### ScrollView
 
 
+
 #### `react-navigation` v5
-
-
 
 ## Configure
 
@@ -95,18 +97,20 @@ import { Image } from 'react-native';
     // forwardIcon,
     // refreshIcon,
     // volumeOffIcon,
-    // volumeUpIcon, 
+    // volumeUpIcon,
   }}
 />;
 ```
 
 #### `initialPaused`
+
 paused video on mount
 
 - type: `boolean`
 - default: `false`
 
 #### `initialMuted`
+
 mute video on mount
 
 - type: `boolean`
@@ -170,6 +174,10 @@ function Screen() {
 
 Restart the metro & simulator, you should see the difference like the image below.
 
-| Before | After |
-| ------ | ----- |
-|        |       |
+| Before                                                                                                          | After                                                                                                           |
+| --------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| ![image](https://user-images.githubusercontent.com/18292247/103458307-4c174480-4d39-11eb-9e75-77f43024032e.png) | ![image](https://user-images.githubusercontent.com/18292247/103458311-546f7f80-4d39-11eb-8b82-ee9e9e8e82e1.png) |
+
+## Incoming Feature
+
+Take a look at [MVP project board](https://github.com/siriwatknp/react-native-video-extension/projects/1)

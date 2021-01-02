@@ -19,7 +19,8 @@ export type VideoContainerProps = {
 
 const VideoContainer = ({
   mode,
-  initialPaused,
+  initialPaused = false,
+  initialMuted = false,
   aspectRatio = 16 / 9,
   children,
 }: PropsWithChildren<VideoContainerProps>) => {
@@ -44,7 +45,7 @@ const VideoContainer = ({
   } as const;
   const fullscreenStyle = getLayoutStyle[mode]?.(fullscreenData);
   return (
-    <InternalProvider initialPaused={initialPaused}>
+    <InternalProvider initialPaused={initialPaused} initialMuted={initialMuted}>
       <View
         style={StyleSheet.flatten([
           styles.container,
