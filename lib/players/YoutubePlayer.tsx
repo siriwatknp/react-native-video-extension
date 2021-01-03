@@ -1,8 +1,8 @@
-import React, { useRef } from 'react';
-import { Platform, View, ViewProps, Animated } from 'react-native';
-import { VideoProperties } from 'react-native-video';
+import React, { forwardRef, ReactNode, useRef } from 'react';
+import { Platform, View, Animated } from 'react-native';
+import Video from 'react-native-video';
 import withDefaultScreenContainer from '../DefaultScreenContainer';
-import { useVideoCtx } from '../ScreenContainer';
+import { FullscreenOrientation, useVideoCtx } from '../ScreenContainer';
 import { useInternalCtx } from '../InternalCtx';
 import { AspectRatio } from '../utils';
 import Overlay from '../controls/Overlay';
@@ -14,7 +14,7 @@ import VolumeToggle from '../controls/VolumeToggle';
 import PlayPauseRefresh from '../controls/PlayPauseRefresh';
 import Replay from '../controls/Replay';
 import Forward from '../controls/Forward';
-import RNVideo from '../Video/RNVideo';
+import RNVideo, { RNVideoProps } from '../Video/RNVideo';
 import VideoContainer from '../Video/VideoContainer';
 import EnhancedSeeker from '../Seeker/EnhancedSeeker';
 import EnhancedTimelineBar from '../Seeker/EnhancedTimelineBar';
@@ -33,78 +33,89 @@ const EnhancedTimer = () => {
 };
 
 export type YoutubePlayerProps = {
-  style?: ViewProps['style'];
-  videoStyle?: VideoProperties['style'];
   initialPaused?: boolean;
   initialMuted?: boolean;
   aspectRatio?: AspectRatio;
   mode: 'auto-fit' | 'contain';
   customIcon?: IconConfig;
-} & Omit<VideoProperties, 'paused'>;
+  renderToolbar?: (fullscreen: false | FullscreenOrientation) => ReactNode;
+} & RNVideoProps;
 
-const YoutubePlayer = ({
-  mode,
-  initialPaused = false,
-  initialMuted = false,
-  aspectRatio = 'landscape',
-  customIcon,
-  ...props
-}: YoutubePlayerProps) => {
-  const { fullscreen, consoleHidden } = useVideoCtx();
-  const progressObserver = useRef(new Animated.Value(0)).current;
-  return (
-    <VideoContainer
-      mode={mode}
-      aspectRatio={aspectRatio}
-      initialPaused={initialPaused}
-      initialMuted={initialMuted}
-    >
-      <RNVideo style={{ width: '100%', height: '100%' }} {...props} />
-      <Overlay>
-        <Center>
-          <Replay>{customIcon?.replayIcon}</Replay>
-          <PlayPauseRefresh {...customIcon} />
-          <Forward>{customIcon?.forwardIcon}</Forward>
-        </Center>
-        <View style={{ flex: 1, alignSelf: 'stretch' }}>
-          <View style={{ flex: 1 }} />
-          <View
-            style={{
-              width: '100%',
-              bottom: fullscreen || Platform.OS === 'android' ? 0 : SNAP_BOTTOM,
-              paddingHorizontal: fullscreen ? 20 : 0,
-            }}
-          >
+const YoutubePlayer = forwardRef<Video, YoutubePlayerProps>(
+  (
+    {
+      mode,
+      initialPaused = false,
+      initialMuted = false,
+      aspectRatio = 'landscape',
+      customIcon,
+      renderToolbar,
+      ...props
+    },
+    ref,
+  ) => {
+    const { fullscreen, consoleHidden } = useVideoCtx();
+    const progressObserver = useRef(new Animated.Value(0)).current;
+    return (
+      <VideoContainer
+        mode={mode}
+        aspectRatio={aspectRatio}
+        initialPaused={initialPaused}
+        initialMuted={initialMuted}
+      >
+        <RNVideo
+          style={{ width: '100%', height: '100%' }}
+          {...props}
+          ref={ref}
+        />
+        <Overlay>
+          <Center>
+            <Replay>{customIcon?.replayIcon}</Replay>
+            <PlayPauseRefresh {...customIcon} />
+            <Forward>{customIcon?.forwardIcon}</Forward>
+          </Center>
+          <View style={{ flex: 1, alignSelf: 'stretch' }}>
+            {renderToolbar?.(fullscreen)}
+            <View style={{ flex: 1 }} />
             <View
               style={{
-                alignSelf: 'flex-end',
-                flexDirection: 'row',
-                alignItems: 'center',
-                ...(!fullscreen && { marginRight: 8, marginBottom: -8 }),
+                width: '100%',
+                bottom:
+                  fullscreen || Platform.OS === 'android' ? 0 : SNAP_BOTTOM,
+                paddingHorizontal: fullscreen ? 20 : 0,
               }}
             >
-              <VolumeToggle style={{ marginRight: 8 }} {...customIcon} />
-              <FullscreenToggle {...customIcon} />
+              <View
+                style={{
+                  alignSelf: 'flex-end',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  ...(!fullscreen && { marginRight: 8, marginBottom: -8 }),
+                }}
+              >
+                <VolumeToggle style={{ marginRight: 8 }} {...customIcon} />
+                <FullscreenToggle {...customIcon} />
+              </View>
+              <EnhancedSeeker mode={mode} progressObserver={progressObserver}>
+                <EnhancedTimer />
+              </EnhancedSeeker>
             </View>
-            <EnhancedSeeker mode={mode} progressObserver={progressObserver}>
-              <EnhancedTimer />
-            </EnhancedSeeker>
           </View>
+        </Overlay>
+        <View
+          style={{
+            width: '100%',
+            position: 'absolute',
+            bottom: 2,
+            opacity: !fullscreen && consoleHidden ? 1 : 0,
+          }}
+          pointerEvents={'none'}
+        >
+          <EnhancedTimelineBar progress={progressObserver} />
         </View>
-      </Overlay>
-      <View
-        style={{
-          width: '100%',
-          position: 'absolute',
-          bottom: 2,
-          opacity: !fullscreen && consoleHidden ? 1 : 0,
-        }}
-        pointerEvents={'none'}
-      >
-        <EnhancedTimelineBar progress={progressObserver} />
-      </View>
-    </VideoContainer>
-  );
-};
+      </VideoContainer>
+    );
+  },
+);
 
 export default withDefaultScreenContainer(YoutubePlayer);

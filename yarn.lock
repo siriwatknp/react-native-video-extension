@@ -5790,6 +5790,17 @@ mute-stream@0.0.8:
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.8.tgz#1630c42b2251ff81e2a283de96a5497ea92e5e0d"
   integrity sha512-nnbWWOkoWyUsTjKrhgD0dcz22mdkSnpYqbEjIm2nhwhuxlSkpywJmBo8h0ZqJdkp73mb90SssHkN4rsRaBAfAA==
 
+mux-embed@^3.4:
+  version "3.4.3"
+  resolved "https://registry.yarnpkg.com/mux-embed/-/mux-embed-3.4.3.tgz#151a200482f2033a1c747850f81c8669484eec92"
+  integrity sha512-jb1bAYicWaK2lHGbEAG76Tu9CopGxqxk6qaLN0RtTxyv2FDXMFuKM6GDkttSlDcJ6wCGSYPqtX+EgcXfDZC7fg==
+
+"mux-react-native-video-sdk@https://github.com/muxinc/mux-stats-sdk-react-native-video#v0.1.0":
+  version "0.1.0"
+  resolved "https://github.com/muxinc/mux-stats-sdk-react-native-video#c1bffc321a689dc92064cf5ce77143994735c4c3"
+  dependencies:
+    mux-embed "^3.4"
+
 nan@^2.12.1:
   version "2.14.2"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.2.tgz#f5376400695168f4cc694ac9393d0c9585eeea19"

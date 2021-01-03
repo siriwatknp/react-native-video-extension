@@ -1,4 +1,5 @@
 ![Publish Package](https://github.com/siriwatknp/react-native-video-extension/workflows/Publish%20Package/badge.svg)
+![NPM](https://img.shields.io/npm/l/react-native-video-extension)
 
 # React Native Video (Extension)
 
@@ -10,6 +11,7 @@ A wrapper library for [react-native-video](https://github.com/react-native-video
 - able to use with react-navigation (see example)
 - icon & color configurable
 - written in typescript
+- works with Mux
 
 **Currently, comes with 2 styles**
 
@@ -58,6 +60,7 @@ See the [full code](/src/examples/BasicExample.tsx)
 - [ScrollView](/src/examples/ScrollViewExample.tsx)
 - [FlatList](/src/examples/FlatListExample.tsx)
 - [StackNavigation](/src/examples/StackNavigationExample.tsx)
+- [MuxData](/src/examples/MuxDataExample.tsx)
 
 ## API
 
@@ -70,6 +73,7 @@ See the [full code](/src/examples/BasicExample.tsx)
 | initialMuted  | boolean                            |          |    `false`     | mute video on mount                                                                                                                                                                                                                         |
 |  aspecRatio   | number \| "portrait" \| "landscape |          |   `portrait`   | the ratio of the video when it is not in fullscreen mode <br /><br /> note: landscape is `16:9`, portrait is `3:4`                                                                                                                          |
 |  customIcon   | object                             |          | material icons | override default icon                                                                                                                                                                                                                       |
+|  renderToolbar   | (fullscreen) => ReactNode       |          |                | render something at the top (inside video), such as Title, Share button, More action                                                                                                                                                                                                                       |
 
 **customIcon example**
 

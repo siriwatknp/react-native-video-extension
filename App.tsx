@@ -28,6 +28,7 @@ import BasicExample from './src/examples/BasicExample';
 import ScrollViewExample from './src/examples/ScrollViewExample';
 import FlatListExample from './src/examples/FlatListExample';
 import SafeAreaExample from './src/examples/SafeAreaExample';
+import MuxDataExample from './src/examples/MuxDataExample';
 import ButtonBase from './src/components/ButtonBase';
 
 declare const global: { HermesInternal: null | {} };
@@ -42,19 +43,20 @@ export type RootStackParamList = {
 };
 
 const SCREENS = [
-  'basic',
-  'safeArea',
-  'scrollView',
-  'flatList',
-  'navigation',
+  'Basic',
+  'SafeArea',
+  'ScrollView',
+  'FlatList',
+  'Navigation',
+  'MuxData',
 ] as const;
 
 const App = () => {
   const [visible, setVisible] = useState(false);
-  const [screen, setScreen] = useState<typeof SCREENS[number]>('navigation');
+  const [screen, setScreen] = useState<typeof SCREENS[number]>('Navigation');
   return (
     <SafeAreaProvider>
-      {screen === 'navigation' && (
+      {screen === 'Navigation' && (
         <NavigationContainer>
           <Stack.Navigator>
             <Stack.Screen name="Home" component={Home} />
@@ -67,10 +69,11 @@ const App = () => {
           </Stack.Navigator>
         </NavigationContainer>
       )}
-      {screen === 'basic' && <BasicExample />}
-      {screen === 'safeArea' && <SafeAreaExample />}
-      {screen === 'scrollView' && <ScrollViewExample />}
-      {screen === 'flatList' && <FlatListExample />}
+      {screen === 'Basic' && <BasicExample />}
+      {screen === 'SafeArea' && <SafeAreaExample />}
+      {screen === 'ScrollView' && <ScrollViewExample />}
+      {screen === 'FlatList' && <FlatListExample />}
+      {screen === 'MuxData' && <MuxDataExample />}
       {global.HermesInternal == null ? null : (
         <View style={styles.engine}>
           <Text style={styles.footer}>Engine: Hermes</Text>
@@ -101,7 +104,7 @@ const App = () => {
               }}
               style={{ marginTop: index !== 0 ? 16 : 0 }}
             >
-              {s.substr(0, 1).toUpperCase() + s.substring(1)}
+              {s}
             </ButtonBase>
           ))}
         </View>
