@@ -56,11 +56,11 @@ See the [full code](/src/examples/BasicExample.tsx)
 
 ### More examples
 
-- [SafeArea](/src/examples/SafeAreaExample.tsx)
-- [ScrollView](/src/examples/ScrollViewExample.tsx)
-- [FlatList](/src/examples/FlatListExample.tsx)
-- [StackNavigation](/src/examples/StackNavigationExample.tsx)
-- [MuxData](/src/examples/MuxDataExample.tsx)
+- [SafeArea](https://github.com/siriwatknp/react-native-video-extension/tree/main/src/examples/SafeAreaExample.tsx)
+- [ScrollView](https://github.com/siriwatknp/react-native-video-extension/tree/main/src/examples/ScrollViewExample.tsx)
+- [FlatList](https://github.com/siriwatknp/react-native-video-extension/tree/main/src/examples/FlatListExample.tsx)
+- [StackNavigation](https://github.com/siriwatknp/react-native-video-extension/tree/main/src/examples/StackNavigationExample.tsx)
+- [MuxData](https://github.com/siriwatknp/react-native-video-extension/tree/main/src/examples/MuxDataExample.tsx)
 
 ## API
 
@@ -74,6 +74,12 @@ See the [full code](/src/examples/BasicExample.tsx)
 |  aspecRatio   | number \| "portrait" \| "landscape |          |   `portrait`   | the ratio of the video when it is not in fullscreen mode <br /><br /> note: landscape is `16:9`, portrait is `3:4`                                                                                                                          |
 |  customIcon   | object                             |          | material icons | override default icon                                                                                                                                                                                                                       |
 |  renderToolbar   | (fullscreen) => ReactNode       |          |                | render something at the top (inside video), such as Title, Share button, More action                                                                                                                                                                                                                       |
+
+**mode detail**
+
+| Auto Fit                                                                                                        | Contain                                                                                                           |
+| --------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| ![Auto Fit](https://user-images.githubusercontent.com/18292247/103472502-fb4b2e80-4dc0-11eb-96c3-88b5b059e1a3.jpg) | ![Contain](https://user-images.githubusercontent.com/18292247/103472503-fc7c5b80-4dc0-11eb-9f21-49242410a9ff.jpg) |
 
 **customIcon example**
 
