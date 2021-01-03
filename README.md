@@ -49,31 +49,30 @@ function Screen() {
 }
 ```
 
+See the [full code](/src/examples/BasicExample.tsx)
+
 > Note: each screen should have only one type of player!
 
-#### ScrollView
+#### More examples
 
+- [SafeArea](/src/examples/SafeAreaExample.tsx)
+- [ScrollView](/src/examples/ScrollViewExample.tsx)
+- [FlatList](/src/examples/FlatListExample.tsx)
+- [StackNavigation](/src/examples/StackNavigationExample.tsx)
 
+## API
 
-#### `react-navigation` v5
+#### YoutubePlayer, FacebookPlayer
 
-## Configure
+|    PropName   | type                                 | required |     default    | description                                                                                                                                                                                                                                 |
+|:-------------:|--------------------------------------|:--------:|:--------------:|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| mode          | "auto-fit" \|  "contain"             |     ✅    |                | `auto-fit` : When rotate device or enter fullscreen manually, the video will display on the orientation that it fit the device the most <br /><br /> `contain` : In fullscreen, the video will always display the same orientation as user. |
+| initialPaused | boolean                              |          | `false`        | pause video on mount                                                                                                                                                                                                                        |
+| initialMuted  | boolean                              |          | `false`        | mute video on mount                                                                                                                                                                                                                         |
+| aspecRatio    | number \|  "portrait" \|  "landscape |          | `portrait`     | the ratio of the video when it is not in fullscreen mode <br /><br />   note: landscape is `16:9`, portrait is `3:4`                                                                                                                        |
+| customIcon    | object                               |          | material icons | override default icon                                                                                                                                                                                                                       |
 
-`props` that you can pass to `FacebookPlayer`, `YoutubePlayer` or other player in the future.
-
-#### `mode`
-
-- required: true
-
-| mode       | description                                                                                                                |
-| ---------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `auto-fit` | When rotate device or enter fullscreen manually, the video will display on the orientation that it fit the device the most |
-| `contain`  | In fullscreen, the video will always display the same orientation as user.                                                 |
-
-#### `customIcon`
-
-- type: `ReactElement`
-- default: icons from material.io
+**customIcon example**
 
 ```tsx
 import { Image } from 'react-native';
@@ -86,7 +85,7 @@ import { Image } from 'react-native';
   customIcon={{
     fullscreenIcon: (
       <Image
-        src={require('../assets/fullscreen-icon.png')}
+        src={require('../your-assets/fullscreen-icon.png')}
         style={{ width: 24, height: 24 }}
       />
     ),
@@ -101,29 +100,6 @@ import { Image } from 'react-native';
   }}
 />;
 ```
-
-#### `initialPaused`
-
-paused video on mount
-
-- type: `boolean`
-- default: `false`
-
-#### `initialMuted`
-
-mute video on mount
-
-- type: `boolean`
-- default: `false`
-
-#### `aspecRatio`
-
-the ratio of the video when it is not in fullscreen mode
-
-- type: `number | "portrait" | "landscape"`
-- default: `"landscape"`
-
-> note: landscape is `16:9`, portrait is 3:4`
 
 ## Integration
 
