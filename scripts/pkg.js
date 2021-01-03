@@ -9,8 +9,12 @@ async function createPackageFile() {
     path.resolve(packagePath, './package.json'),
   );
   const { name, version, license, repository } = packageData;
+  let scope = process.argv.find((arg) => arg.startsWith('scope='));
+  if (scope) {
+    scope = scope.replace('scope=', '');
+  }
   const newPackageData = {
-    name,
+    name: `${scope ? `${scope.replace('/', '')}/` : ''}${name}`,
     version,
     private: false,
     repository,

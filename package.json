@@ -17,7 +17,8 @@
     "prebuild": "rimraf dist",
     "build": "tsc -p tsconfig.build.json && yarn copy-readme",
     "release": "./node_modules/.bin/standard-version",
-    "publish:npm": "node scripts/pkg.js && cd dist && yarn publish"
+    "publish:npm": "node scripts/pkg.js && cd dist && yarn publish",
+    "publish:gpr": "node scripts/pkg.js scope=@siriwatknp && cd dist && yarn publish"
   },
   "dependencies": {
     "@react-native-community/masked-view": "^0.1.10",

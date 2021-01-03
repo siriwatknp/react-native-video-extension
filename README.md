@@ -2,13 +2,11 @@
 
 # React Native Video (Extension)
 
-> Origin, I need to implement video player for my client but there is no library that works well with our requirement, we used `react-native-video-controls` but it is not support real fullscreen mode
-> and orientation works only horizontal, so I spent 2 weeks building this library from real world requirements (of course in my free time), and I hope that it saves a lot of your time as well.
-
 A wrapper library for [react-native-video](https://github.com/react-native-video/react-native-video) that provide great video experience for user.
 
 - support fullscreen mode for both iOS & Android
 - auto rotate video
+- lightweight
 - able to use with react-navigation (see example)
 - icon & color configurable
 - written in typescript
@@ -27,12 +25,13 @@ yarn install react-native-video react-native-video-extension
 
 ## Usage
 
-#### Basic
+### Basic
 
 ```tsx
 import React from 'react';
 import { View } from 'react-native';
 import { YoutubePlayer } from 'react-native-video-extension';
+// or use facebook player style
 // import { FacebookPlayer } from "react-native-video-extension";
 
 function Screen() {
@@ -53,7 +52,7 @@ See the [full code](/src/examples/BasicExample.tsx)
 
 > Note: each screen should have only one type of player!
 
-#### More examples
+### More examples
 
 - [SafeArea](/src/examples/SafeAreaExample.tsx)
 - [ScrollView](/src/examples/ScrollViewExample.tsx)
@@ -62,15 +61,15 @@ See the [full code](/src/examples/BasicExample.tsx)
 
 ## API
 
-#### YoutubePlayer, FacebookPlayer
+### YoutubePlayer, FacebookPlayer
 
-|    PropName   | type                                 | required |     default    | description                                                                                                                                                                                                                                 |
-|:-------------:|--------------------------------------|:--------:|:--------------:|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| mode          | "auto-fit" \|  "contain"             |     ✅    |                | `auto-fit` : When rotate device or enter fullscreen manually, the video will display on the orientation that it fit the device the most <br /><br /> `contain` : In fullscreen, the video will always display the same orientation as user. |
-| initialPaused | boolean                              |          | `false`        | pause video on mount                                                                                                                                                                                                                        |
-| initialMuted  | boolean                              |          | `false`        | mute video on mount                                                                                                                                                                                                                         |
-| aspecRatio    | number \|  "portrait" \|  "landscape |          | `portrait`     | the ratio of the video when it is not in fullscreen mode <br /><br />   note: landscape is `16:9`, portrait is `3:4`                                                                                                                        |
-| customIcon    | object                               |          | material icons | override default icon                                                                                                                                                                                                                       |
+|   PropName    | type                               | required |    default     | description                                                                                                                                                                                                                                 |
+| :-----------: | ---------------------------------- | :------: | :------------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|     mode      | "auto-fit" \| "contain"            |    ✅    |                | `auto-fit` : When rotate device or enter fullscreen manually, the video will display on the orientation that it fit the device the most <br /><br /> `contain` : In fullscreen, the video will always display the same orientation as user. |
+| initialPaused | boolean                            |          |    `false`     | pause video on mount                                                                                                                                                                                                                        |
+| initialMuted  | boolean                            |          |    `false`     | mute video on mount                                                                                                                                                                                                                         |
+|  aspecRatio   | number \| "portrait" \| "landscape |          |   `portrait`   | the ratio of the video when it is not in fullscreen mode <br /><br /> note: landscape is `16:9`, portrait is `3:4`                                                                                                                          |
+|  customIcon   | object                             |          | material icons | override default icon                                                                                                                                                                                                                       |
 
 **customIcon example**
 
@@ -99,6 +98,77 @@ import { Image } from 'react-native';
     // volumeUpIcon,
   }}
 />;
+```
+
+### ScreenContainer
+
+React Context that provide state of the video, useful when you want to do some fancy thing.
+In this example, we need to disable scroll gesture in ScrollView while we are in fullscreen mode or dragging the thumb in the seeker.
+
+```tsx
+import { ScreenContainer, FacebookPlayer } from 'react-native-video-extension';
+
+function App() {
+  return (
+    <ScreenContainer>
+      {({ fullscreen, seeking }) => {
+        return (
+          <SafeAreaView
+            style={{ flex: 1, backgroundColor: fullscreen ? '#000' : '#fff' }}
+          >
+            <ScrollView
+              scrollEnabled={!fullscreen && !seeking}
+              style={{ flex: 1 }}
+              contentContainerStyle={{ flex: fullscreen ? 1 : 0 }}
+            >
+              {/* some header goes here */}
+              <FacebookPlayer
+                source={{
+                  uri:
+                    'https://stream.mux.com/Tyu80069gbkJR2uIYlz2xARq8VOl4dLg3.m3u8',
+                }}
+                mode="contain"
+              />
+              {/* some content goes here */}
+            </ScrollView>
+          </SafeAreaView>
+        );
+      }}
+    </ScreenContainer>
+  );
+}
+```
+
+| name          | value                                                        | description                                                                    |
+| ------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------ |
+| fullscreen    | false \| "PORTRAIT" \| "LANDSCAPE-LEFT" \| "LANDSCAPE-RIGHT" | if not `false`, it provide the device orientation while in fullscreen mode     |
+| seeking       | boolean                                                      | whether the thumb in seeker is dragging or not                                 |
+| loading       | boolean                                                      | if `true`, video is not ready to play                                          |
+| consoleHidden | boolean                                                      | if `true`, the controls is displaying (ex, play, forward, replay, seeker, ...) |
+| isLandscape   | boolean                                                      | if `true`, the loaded video has naturalSize = "landscape"                      |
+
+If you want to hook into the context in other component, use `useVideoCtx` like this.
+
+```tsx
+import { useEffect } from 'react';
+import { View, Text } from 'react-native';
+import { useVideoCtx } from 'react-native-video-extension';
+
+// This component must be rendered inside ScreenContainer only!
+function Awesome() {
+  const { fullscreen } = useVideoCtx();
+  useEffect(() => {
+    if (fullscreen) {
+      // Logger.send('fullscreen', 'uid)
+      // just an example, I have no idea what I just wrote
+    }
+  }, [fullscreen]);
+  return (
+    <View>
+      <Text>{fullscreen ? 'Wow' : ''}</Text>
+    </View>
+  );
+}
 ```
 
 ## Integration
