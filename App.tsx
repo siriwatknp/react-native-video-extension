@@ -26,6 +26,7 @@ import Canvas from './src/Canvas';
 import StackNavigationExample from './src/examples/StackNavigationExample';
 import BasicExample from './src/examples/BasicExample';
 import ScrollViewExample from './src/examples/ScrollViewExample';
+import FlatListExample from './src/examples/FlatListExample';
 import SafeAreaExample from './src/examples/SafeAreaExample';
 import ButtonBase from './src/components/ButtonBase';
 
@@ -40,11 +41,17 @@ export type RootStackParamList = {
   StackNavigationExample: undefined;
 };
 
+const SCREENS = [
+  'basic',
+  'safeArea',
+  'scrollView',
+  'flatList',
+  'navigation',
+] as const;
+
 const App = () => {
   const [visible, setVisible] = useState(false);
-  const [screen, setScreen] = useState<
-    'basic' | 'safeArea' | 'scrollView' | 'navigation'
-  >('navigation');
+  const [screen, setScreen] = useState<typeof SCREENS[number]>('navigation');
   return (
     <SafeAreaProvider>
       {screen === 'navigation' && (
@@ -63,6 +70,7 @@ const App = () => {
       {screen === 'basic' && <BasicExample />}
       {screen === 'safeArea' && <SafeAreaExample />}
       {screen === 'scrollView' && <ScrollViewExample />}
+      {screen === 'flatList' && <FlatListExample />}
       {global.HermesInternal == null ? null : (
         <View style={styles.engine}>
           <Text style={styles.footer}>Engine: Hermes</Text>
@@ -84,41 +92,18 @@ const App = () => {
         onRequestClose={() => setVisible(false)}
       >
         <View style={styles.paper}>
-          <ButtonBase
-            onPress={() => {
-              setScreen('basic');
-              setVisible(false);
-            }}
-          >
-            Basic
-          </ButtonBase>
-          <ButtonBase
-            onPress={() => {
-              setScreen('safeArea');
-              setVisible(false);
-            }}
-            style={{ marginTop: 16 }}
-          >
-            Safe Area View
-          </ButtonBase>
-          <ButtonBase
-            onPress={() => {
-              setScreen('scrollView');
-              setVisible(false);
-            }}
-            style={{ marginTop: 16 }}
-          >
-            Scroll View
-          </ButtonBase>
-          <ButtonBase
-            onPress={() => {
-              setScreen('navigation');
-              setVisible(false);
-            }}
-            style={{ marginTop: 16 }}
-          >
-            Navigation
-          </ButtonBase>
+          {SCREENS.map((s, index) => (
+            <ButtonBase
+              key={s}
+              onPress={() => {
+                setScreen(s);
+                setVisible(false);
+              }}
+              style={{ marginTop: index !== 0 ? 16 : 0 }}
+            >
+              {s.substr(0, 1).toUpperCase() + s.substring(1)}
+            </ButtonBase>
+          ))}
         </View>
       </Modal>
     </SafeAreaProvider>

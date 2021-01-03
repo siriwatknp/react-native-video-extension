@@ -3,7 +3,7 @@ import { View, Text } from 'react-native';
 
 export type PostContentProps = {};
 
-const MoreVideo = () => (
+export const MoreVideo = () => (
   <View style={{ padding: 16, flexDirection: 'row', width: '100%' }}>
     <View
       style={{
