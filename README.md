@@ -22,7 +22,13 @@ A wrapper library for [react-native-video](https://github.com/react-native-video
 ## Installation
 
 ```bash
-yarn install react-native-video react-native-video-extension
+yarn add react-native-video react-native-video-extension
+```
+
+or
+
+```bash
+npm install --save react-native-video react-native-video-extension
 ```
 
 ## Usage
