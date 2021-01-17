@@ -1,10 +1,8 @@
 name: Branch
 
 on:
-  push:
-    branches:
-      - "**"
-      - "!main"
+  pull_request:
+    branches: [main]
 
 jobs:
   test:
@@ -14,7 +12,9 @@ jobs:
       - uses: c-hive/gha-yarn-cache@v1
       - name: Install dependencies
         run: yarn
-      - uses: ziishaned/jest-reporter-action@v0.0.1
+      - uses: mattallty/jest-github-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          test-command: "yarn test --coverage"
+          test-command: "yarn test"
+          working-directory: "lib"
