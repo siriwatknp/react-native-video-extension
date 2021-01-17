@@ -1,0 +1,20 @@
+name: Branch
+
+on:
+  push:
+    branches:
+      - "**"
+      - "!master"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: c-hive/gha-yarn-cache@v1
+      - name: Install dependencies
+        run: yarn
+      - uses: ziishaned/jest-reporter-action@v0.1.1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          test-command: "yarn test --coverage"
