@@ -1,5 +1,6 @@
 import React from 'react';
 import { Animated, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import { useVideoCtx } from '../ScreenContainer';
 
 export type TimelineBarProps = {
   barHeight?: number;
@@ -22,41 +23,44 @@ const TimelineBar = ({
   filledColor = DEFAULT_COLOR,
   progress = 0,
   styles,
-}: TimelineBarProps) => (
-  <>
-    <View
-      testID="seeker_duration"
-      style={StyleSheet.flatten([
-        staticStyles.duration,
-        styles?.duration,
-        { height: barHeight },
-      ])}
-    />
-    <View
-      testID="seeker_buffer"
-      style={StyleSheet.flatten([
-        staticStyles.buffer,
-        styles?.buffer,
-        {
-          width: `${buffer * 100}%`,
-          height: barHeight,
-        },
-      ])}
-    />
-    <Animated.View
-      testID="seeker_played"
-      style={StyleSheet.flatten([
-        staticStyles.played,
-        { backgroundColor: filledColor },
-        styles?.played,
-        {
-          height: barHeight,
-          width: progress,
-        },
-      ])}
-    />
-  </>
-);
+}: TimelineBarProps) => {
+  const { config: ctxConfig } = useVideoCtx();
+  return (
+    <>
+      <View
+        testID="seeker_duration"
+        style={StyleSheet.flatten([
+          staticStyles.duration,
+          styles?.duration,
+          { height: barHeight },
+        ])}
+      />
+      <View
+        testID="seeker_buffer"
+        style={StyleSheet.flatten([
+          staticStyles.buffer,
+          styles?.buffer,
+          {
+            width: `${buffer * 100}%`,
+            height: barHeight,
+          },
+        ])}
+      />
+      <Animated.View
+        testID="seeker_played"
+        style={StyleSheet.flatten([
+          staticStyles.played,
+          { backgroundColor: ctxConfig?.seekerColor ?? filledColor },
+          styles?.played,
+          {
+            height: barHeight,
+            width: progress,
+          },
+        ])}
+      />
+    </>
+  );
+};
 
 const staticStyles = StyleSheet.create({
   duration: {

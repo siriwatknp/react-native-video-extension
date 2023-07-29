@@ -73,18 +73,19 @@ const Seeker = ({
   styles,
 }: React.PropsWithChildren<SeekerProps>) => {
   const {
-    filledColor = DEFAULT_COLOR,
-    buttonColor = DEFAULT_COLOR,
+    fullscreen,
+    isLandscape: isLandscapeVideo,
+    consoleHidden,
+    config: ctxConfig,
+  } = useVideoCtx();
+  const {
+    filledColor = ctxConfig?.seekerColor ?? DEFAULT_COLOR,
+    buttonColor = ctxConfig?.seekerColor ?? DEFAULT_COLOR,
     thumbSize = THUMB_SIZE,
     barHeight = BAR_HEIGHT,
     initialButtonSize = INITIAL_BUTTON_SIZE,
     touchedButtonSize = TOUCHED_BUTTON_SIZE,
   } = config;
-  const {
-    fullscreen,
-    isLandscape: isLandscapeVideo,
-    consoleHidden,
-  } = useVideoCtx();
   const barOpacity = useOpacity(consoleHidden && !!fullscreen);
   const scaleAnim = useScaleSpring(consoleHidden);
   const [seeking, setSeeking] = useState(false);
