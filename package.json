@@ -35,6 +35,7 @@
     "react-native-screens": "^2.16.1",
     "react-native-svg": "12.1.0",
     "react-native-video": "5.1.0-alpha8",
+    "mux-react-native-video-sdk": "https://github.com/muxinc/mux-stats-sdk-react-native-video#v0.1.0",
     "yarn": "^1.22.10"
   },
   "devDependencies": {
@@ -51,7 +52,6 @@
     "eslint": "^6.5.1",
     "jest": "^25.1.0",
     "metro-react-native-babel-preset": "^0.59.0",
-    "mux-react-native-video-sdk": "https://github.com/muxinc/mux-stats-sdk-react-native-video#v0.1.0",
     "ncp": "2.0.0",
     "react-is": "17.0.1",
     "react-test-renderer": "16.13.1",
