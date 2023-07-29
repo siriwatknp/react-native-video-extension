@@ -14,7 +14,7 @@ export type TimelineBarProps = {
 };
 
 const BAR_HEIGHT = 2;
-const DEFAULT_COLOR = '#ff2525';
+const DEFAULT_COLOR = '#22D473';
 
 const TimelineBar = ({
   barHeight = BAR_HEIGHT,

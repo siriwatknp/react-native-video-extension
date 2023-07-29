@@ -50,7 +50,7 @@ const within = (min: number, number: number, max: number) => {
   return number;
 };
 
-const DEFAULT_COLOR = '#ff2525';
+const DEFAULT_COLOR = '#22D473';
 const THUMB_SIZE = 40;
 const BAR_HEIGHT = 2;
 const INITIAL_BUTTON_SIZE = 16;
